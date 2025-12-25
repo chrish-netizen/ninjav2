@@ -1464,8 +1464,22 @@ client.on('interactionCreate', async (interaction) => {
     // HELP MENU (wide layout)
     // ============================================================
     if (interaction.isStringSelectMenu() && interaction.customId === 'help-menu') {
-      const container = buildCategoryContainer(interaction.values[0], client.user.username);
-      if (!container) return;
+      const cat = HELP_CATEGORIES[interaction.values[0]];
+      if (!cat) return;
+
+      const botName = client.user.username;
+      const commandList = cat.commands.map(c => `**${c.name}** - ${c.desc}`).join('\n');
+
+      const container = new ContainerBuilder()
+        .setAccentColor(0x2b2d31)
+        .addTextDisplayComponents(
+          (text) => text.setContent(`**${cat.emoji} ${cat.title}**`),
+          (text) => text.setContent(commandList)
+        )
+        .addSeparatorComponents((sep) => sep.setDivider(true))
+        .addActionRowComponents((row) => row.addComponents(createHelpDropdown()))
+        .addTextDisplayComponents((text) => text.setContent(`-# ${botName} • Help System`));
+
       return interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
     }
 
