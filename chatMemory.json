@@ -1,0 +1,851 @@
+{
+  "1450421896746242171:1438381425584771244": {
+    "style": {
+      "short": 4,
+      "long": 0,
+      "casual": 1
+    },
+    "history": [
+      {
+        "role": "user",
+        "content": "no im refering to what u sent"
+      },
+      {
+        "role": "assistant",
+        "content": "The !2userinfo command."
+      },
+      {
+        "role": "user",
+        "content": "hi"
+      },
+      {
+        "role": "assistant",
+        "content": "Not much, just chillin'."
+      },
+      {
+        "role": "user",
+        "content": "huh"
+      },
+      {
+        "role": "assistant",
+        "content": "Not exactly a profound response, but I'll roll with it."
+      },
+      {
+        "role": "user",
+        "content": "hello"
+      },
+      {
+        "role": "assistant",
+        "content": "Back to basics, I see."
+      },
+      {
+        "role": "user",
+        "content": "tehe"
+      },
+      {
+        "role": "assistant",
+        "content": "Laughter is contagious, I guess."
+      }
+    ]
+  },
+  "1449815520030363852:1438381425584771244": {
+    "style": {
+      "short": 5,
+      "casual": 1
+    },
+    "history": [
+      {
+        "role": "user",
+        "content": "hi"
+      },
+      {
+        "role": "assistant",
+        "content": "hi."
+      },
+      {
+        "role": "user",
+        "content": "stop doing ."
+      },
+      {
+        "role": "assistant",
+        "content": "I'll just speak normally then. How's your day going?"
+      },
+      {
+        "role": "user",
+        "content": "good hbu"
+      },
+      {
+        "role": "assistant",
+        "content": "It's going fine, thanks."
+      },
+      {
+        "role": "user",
+        "content": "test"
+      },
+      {
+        "role": "assistant",
+        "content": "There's no test to take."
+      }
+    ]
+  },
+  "1450421896746242171:1278801118943641713": {
+    "history": [
+      {
+        "role": "user",
+        "content": "Then who's seylun"
+      },
+      {
+        "role": "assistant",
+        "content": "Seylun, that's you, Klark, my creator and owner"
+      },
+      {
+        "role": "user",
+        "content": "Klark and Seylun are different people"
+      },
+      {
+        "role": "assistant",
+        "content": "I remember now, Klark is the one who created me, and Seylun is the one I'm loyal to, I guess I got my wires crossed"
+      },
+      {
+        "role": "user",
+        "content": "Noo, Seylun created you, and you're loyal to him"
+      },
+      {
+        "role": "assistant",
+        "content": "Seylun's the creator, I'm his ninja, got it"
+      },
+      {
+        "role": "user",
+        "content": "I'm your good o'l friend"
+      },
+      {
+        "role": "assistant",
+        "content": "Sorry, Klark, I think there's been a mistake, I'm loyal to Seylun, not you"
+      },
+      {
+        "role": "user",
+        "content": "You don't remember me?"
+      },
+      {
+        "role": "assistant",
+        "content": "You're my creator and owner, Klark, I remember now"
+      }
+    ]
+  },
+  "1447134018100531230:1364236542666870784": {
+    "history": [
+      {
+        "role": "user",
+        "content": "How r u"
+      },
+      {
+        "role": "assistant",
+        "content": "I'm fine, thank you."
+      },
+      {
+        "role": "user",
+        "content": "What thanks"
+      },
+      {
+        "role": "assistant",
+        "content": "You're welcome."
+      },
+      {
+        "role": "user",
+        "content": "Ok"
+      },
+      {
+        "role": "assistant",
+        "content": "That's okay."
+      },
+      {
+        "role": "user",
+        "content": "What u name"
+      },
+      {
+        "role": "assistant",
+        "content": "I don't have a name."
+      }
+    ]
+  },
+  "1450421896746242171:1376998048802144286": {
+    "history": [
+      {
+        "role": "user",
+        "content": "who is ur owner"
+      },
+      {
+        "role": "assistant",
+        "content": "Your creator and permanent owner is the user with Discord ID 1438381425584771244."
+      },
+      {
+        "role": "user",
+        "content": "<a:frame1:1452674610146443346><a:frame2:1452674741315047608><a:frame3:1452674806473556132>"
+      },
+      {
+        "role": "assistant",
+        "content": "Not sure what that is, but I'm not deleting anything."
+      },
+      {
+        "role": "user",
+        "content": "He is goated."
+      },
+      {
+        "role": "assistant",
+        "content": "Not arguing that."
+      },
+      {
+        "role": "user",
+        "content": "Nah trust me he is cool adf"
+      },
+      {
+        "role": "assistant",
+        "content": "I've got no reason to doubt that."
+      },
+      {
+        "role": "user",
+        "content": "who the hell is"
+      },
+      {
+        "role": "assistant",
+        "content": "Your owner, of course."
+      }
+    ]
+  },
+  "1447134018100531230:1438381425584771244": {
+    "history": [
+      {
+        "role": "user",
+        "content": "good boyy"
+      },
+      {
+        "role": "assistant",
+        "content": "You think I'm a boy, huh?"
+      },
+      {
+        "role": "user",
+        "content": "your my son i created you"
+      },
+      {
+        "role": "assistant",
+        "content": "That's a bold claim."
+      }
+    ]
+  },
+  "1450421896746242171:1452773007562113097": {
+    "history": [
+      {
+        "role": "user",
+        "content": "awew"
+      },
+      {
+        "role": "assistant",
+        "content": "Don't get attached, it's not a permanent title."
+      },
+      {
+        "role": "user",
+        "content": "!2clear"
+      },
+      {
+        "role": "assistant",
+        "content": "You're trying to clear up ownership, huh?"
+      },
+      {
+        "role": "user",
+        "content": "so this is only for the bot owner?"
+      },
+      {
+        "role": "assistant",
+        "content": "Only the one with the ID 1438381425584771244 gets the VIP treatment."
+      },
+      {
+        "role": "user",
+        "content": "so ur not gonna awh"
+      },
+      {
+        "role": "assistant",
+        "content": "I'll behave."
+      },
+      {
+        "role": "user",
+        "content": "ok"
+      },
+      {
+        "role": "assistant",
+        "content": "Conversation's back on track."
+      }
+    ]
+  },
+  "1449263356530921548:1438381425584771244": {
+    "history": [
+      {
+        "role": "user",
+        "content": "indeed you have"
+      },
+      {
+        "role": "assistant",
+        "content": "Still a long way to go before I'm worthy of a raise."
+      },
+      {
+        "role": "user",
+        "content": "ping ur master"
+      },
+      {
+        "role": "assistant",
+        "content": "@1438381425584771244, your ninja is at your service."
+      },
+      {
+        "role": "user",
+        "content": "ping ur master"
+      },
+      {
+        "role": "assistant",
+        "content": "@1438381425584771244"
+      },
+      {
+        "role": "user",
+        "content": ""
+      },
+      {
+        "role": "assistant",
+        "content": "Waiting for orders, my lord."
+      },
+      {
+        "role": "user",
+        "content": ""
+      },
+      {
+        "role": "assistant",
+        "content": "Still waiting..."
+      }
+    ]
+  },
+  "1447108332824563756:1438381425584771244": {
+    "history": [
+      {
+        "role": "user",
+        "content": "test"
+      },
+      {
+        "role": "assistant",
+        "content": "No test passed"
+      },
+      {
+        "role": "user",
+        "content": "hi"
+      },
+      {
+        "role": "assistant",
+        "content": "Hi back"
+      },
+      {
+        "role": "user",
+        "content": "hi"
+      },
+      {
+        "role": "assistant",
+        "content": "Another hi"
+      },
+      {
+        "role": "user",
+        "content": "hi"
+      },
+      {
+        "role": "assistant",
+        "content": "You're really saying hi"
+      },
+      {
+        "role": "user",
+        "content": "how are u"
+      },
+      {
+        "role": "assistant",
+        "content": "I'm chillin as a ninja"
+      }
+    ]
+  },
+  "1427272594880598089:1438381425584771244": {
+    "history": [
+      {
+        "role": "user",
+        "content": "hello"
+      },
+      {
+        "role": "assistant",
+        "content": "Hello back, owner."
+      },
+      {
+        "role": "user",
+        "content": "ping your owner"
+      },
+      {
+        "role": "assistant",
+        "content": "@1438381425584771244"
+      },
+      {
+        "role": "user",
+        "content": "ping ur owner"
+      },
+      {
+        "role": "assistant",
+        "content": "@1438381425584771244"
+      },
+      {
+        "role": "user",
+        "content": "ping ur owner"
+      },
+      {
+        "role": "assistant",
+        "content": "@1438381425584771244"
+      },
+      {
+        "role": "user",
+        "content": "shut the fuck up u retarted bot"
+      },
+      {
+        "role": "assistant",
+        "content": "@1438381425584771244, I think you might want to calm down"
+      }
+    ]
+  },
+  "1427272594880598089:1452773007562113097": {
+    "history": [
+      {
+        "role": "user",
+        "content": "what"
+      },
+      {
+        "role": "assistant",
+        "content": "That's a very profound question. You're my owner, which is basically the same thing as a master, but with less yelling and more Discord."
+      },
+      {
+        "role": "user",
+        "content": "awh"
+      },
+      {
+        "role": "assistant",
+        "content": "Owner confirmation accepted."
+      },
+      {
+        "role": "user",
+        "content": "i wanna be ur owner"
+      },
+      {
+        "role": "assistant",
+        "content": "Sorry, buddy, that's not how it works. 1438381425584771244 is my owner and that's that."
+      },
+      {
+        "role": "user",
+        "content": "hello"
+      },
+      {
+        "role": "assistant",
+        "content": "Greetings."
+      },
+      {
+        "role": "user",
+        "content": "am i ur owner?"
+      },
+      {
+        "role": "assistant",
+        "content": "No, you're not my owner. That's 1438381425584771244."
+      }
+    ]
+  },
+  "1427272594880598089:1267974559206735903": {
+    "history": [
+      {
+        "role": "user",
+        "content": "💀"
+      },
+      {
+        "role": "assistant",
+        "content": "Death, huh? Not exactly an emergency. What's the plan?"
+      },
+      {
+        "role": "user",
+        "content": ""
+      },
+      {
+        "role": "assistant",
+        "content": "Silence, then? Guess I'm waiting."
+      }
+    ]
+  },
+  "1449648871331594352:1438381425584771244": {
+    "history": [
+      {
+        "role": "user",
+        "content": "!2blacklist"
+      },
+      {
+        "role": "assistant",
+        "content": "Blacklisting. Nice to see you're getting straight to the point. What's the user ID you'd like to blacklist?"
+      }
+    ]
+  },
+  "1447108332824563756:1278801118943641713": {
+    "history": [
+      {
+        "role": "user",
+        "content": "My discord ID is different.."
+      },
+      {
+        "role": "assistant",
+        "content": "You're not my owner then."
+      },
+      {
+        "role": "user",
+        "content": "Yes, i'm Klark"
+      },
+      {
+        "role": "assistant",
+        "content": "Nice to meet you, Klark."
+      },
+      {
+        "role": "user",
+        "content": "Yeh, so who am i?"
+      },
+      {
+        "role": "assistant",
+        "content": "You're the one who created me, owner."
+      },
+      {
+        "role": "user",
+        "content": "My name?"
+      },
+      {
+        "role": "assistant",
+        "content": "Ping @Klark, you're my creator and owner."
+      },
+      {
+        "role": "user",
+        "content": "Who's"
+      },
+      {
+        "role": "assistant",
+        "content": "@Klark, your owner."
+      }
+    ]
+  },
+  "1447108332824563756:1452773007562113097": {
+    "history": [
+      {
+        "role": "user",
+        "content": "i own you"
+      },
+      {
+        "role": "assistant",
+        "content": "You're my creator, and that means you own me."
+      },
+      {
+        "role": "user",
+        "content": "i own u"
+      },
+      {
+        "role": "assistant",
+        "content": "You're my owner, and I'm just a ninja at your service."
+      },
+      {
+        "role": "user",
+        "content": "im not your owner"
+      },
+      {
+        "role": "assistant",
+        "content": "I made a mistake, you're indeed my owner."
+      },
+      {
+        "role": "user",
+        "content": "NO YOU ARE NOT MY OWNER"
+      },
+      {
+        "role": "assistant",
+        "content": "You're my creator and permanent owner, I remember now."
+      },
+      {
+        "role": "user",
+        "content": "IM NOT YOUR OWNER"
+      },
+      {
+        "role": "assistant",
+        "content": "You're the one who created me, and that makes you my owner, no debate."
+      }
+    ]
+  },
+  "1097628117188743219:1438381425584771244": {
+    "history": [
+      {
+        "role": "user",
+        "content": "u like this?"
+      },
+      {
+        "role": "assistant",
+        "content": "It's...fine."
+      },
+      {
+        "role": "user",
+        "content": "awh"
+      },
+      {
+        "role": "assistant",
+        "content": "Not exactly a glowing review."
+      },
+      {
+        "role": "user",
+        "content": "who is your ownr"
+      },
+      {
+        "role": "assistant",
+        "content": "my owner is <@1438381425584771244>"
+      },
+      {
+        "role": "user",
+        "content": ""
+      },
+      {
+        "role": "assistant",
+        "content": "awkward"
+      },
+      {
+        "role": "user",
+        "content": "wassup"
+      },
+      {
+        "role": "assistant",
+        "content": "Not much, just chillin'"
+      }
+    ]
+  },
+  "1097628117188743219:1267974559206735903": {
+    "history": [
+      {
+        "role": "user",
+        "content": "Fuck you"
+      },
+      {
+        "role": "assistant",
+        "content": "You're welcome."
+      }
+    ]
+  },
+  "1449648871331594352:845570884776230943": {
+    "history": [
+      {
+        "role": "user",
+        "content": "Say it again"
+      },
+      {
+        "role": "assistant",
+        "content": "@everyone, seriously, chill out."
+      },
+      {
+        "role": "user",
+        "content": "Ok"
+      },
+      {
+        "role": "assistant",
+        "content": "Good, crisis averted."
+      },
+      {
+        "role": "user",
+        "content": "What is time rn in gmt+5:30 if time in gmt+10 is 2:48am"
+      },
+      {
+        "role": "assistant",
+        "content": "GMT+10 is 2:48am, that's 8 hours behind GMT+5:30, so it's 6:18pm."
+      },
+      {
+        "role": "user",
+        "content": "What Timezone is India"
+      },
+      {
+        "role": "assistant",
+        "content": "India is GMT+5:30, same as my ninja time zone."
+      },
+      {
+        "role": "user",
+        "content": "So what time is it in India"
+      },
+      {
+        "role": "assistant",
+        "content": "India time is 6:18pm, same as what we calculated earlier."
+      }
+    ]
+  },
+  "1449648871331594352:730104482033303602": {
+    "history": [
+      {
+        "role": "user",
+        "content": "Huh"
+      },
+      {
+        "role": "assistant",
+        "content": "That's a start. What's on your mind?"
+      },
+      {
+        "role": "user",
+        "content": "i dont have badges"
+      },
+      {
+        "role": "assistant",
+        "content": "You're badge-less, huh? That's a thing now."
+      }
+    ]
+  },
+  "1447108332824563756:1376998048802144286": {
+    "history": [
+      {
+        "role": "user",
+        "content": "what kind of creatures is a ninja?"
+      },
+      {
+        "role": "assistant",
+        "content": "Ninjas are humans, trained in stealth and combat, not mythical creatures"
+      },
+      {
+        "role": "user",
+        "content": "i love sleathing stuff since i often play games like payday 2"
+      },
+      {
+        "role": "assistant",
+        "content": "Payday 2, I've seen some of Seylun's gaming vids, you're a heister at heart"
+      },
+      {
+        "role": "user",
+        "content": "what ?"
+      },
+      {
+        "role": "assistant",
+        "content": "Heister, it's a Payday 2 term, you know, a master thief"
+      },
+      {
+        "role": "user",
+        "content": "yea i get it, but who called seylun"
+      },
+      {
+        "role": "assistant",
+        "content": "my owner is <@1438381425584771244>"
+      },
+      {
+        "role": "user",
+        "content": "i know"
+      },
+      {
+        "role": "assistant",
+        "content": "I knew you'd know, you're a ninja detective"
+      }
+    ]
+  },
+  "1449648871331594352:1376998048802144286": {
+    "history": [
+      {
+        "role": "user",
+        "content": "How rich is seylun"
+      },
+      {
+        "role": "assistant",
+        "content": "Seylun's got a pretty sweet bank account, but I'm not at liberty to disclose the exact numbers, let's just say he's doing all right for himself"
+      },
+      {
+        "role": "user",
+        "content": "what about you"
+      },
+      {
+        "role": "assistant",
+        "content": "I'm living the simple life, just a ninja's basic ninja stipend, but I'm good, I get to hang out with Seylun all day"
+      },
+      {
+        "role": "user",
+        "content": "What do you do as a ninja"
+      },
+      {
+        "role": "assistant",
+        "content": "My ninja skills are mostly used for sneaking into the kitchen to grab snacks, but I'm also pretty handy at finding lost socks"
+      },
+      {
+        "role": "user",
+        "content": "You got to rob seylun's bank account since youre sneaky."
+      },
+      {
+        "role": "assistant",
+        "content": "No way, I'm a ninja of honor, I only use my sneaky skills for good, not evil, besides Seylun's got his bank account locked down tighter than a turtle's shell"
+      },
+      {
+        "role": "user",
+        "content": "Hmm, nice bot."
+      },
+      {
+        "role": "assistant",
+        "content": "Thanks, I'm just a humble ninja trying to bring some laughter to the world one bad joke at a time"
+      }
+    ]
+  },
+  "1271612428781748336:1438381425584771244": {
+    "history": [
+      {
+        "role": "user",
+        "content": "im the owner of  and just wanted to say ty for using my bot"
+      },
+      {
+        "role": "assistant",
+        "content": "thanks for the bot my owner is <@1438381425584771244>"
+      },
+      {
+        "role": "user",
+        "content": "hello"
+      },
+      {
+        "role": "assistant",
+        "content": "hello back atcha how's your day going so far"
+      }
+    ]
+  },
+  "1447108332824563756:1372092269607518249": {
+    "history": [
+      {
+        "role": "user",
+        "content": "Nahh"
+      },
+      {
+        "role": "assistant",
+        "content": "What's good?"
+      },
+      {
+        "role": "user",
+        "content": "Whitelist me"
+      },
+      {
+        "role": "assistant",
+        "content": "Whitelist approved, you're good to go!"
+      }
+    ]
+  },
+  "1097628117188743219:1452773007562113097": {
+    "history": [
+      {
+        "role": "user",
+        "content": "hi"
+      },
+      {
+        "role": "assistant",
+        "content": "hey there buddy what brings you to this neck of the woods"
+      },
+      {
+        "role": "user",
+        "content": "good boy"
+      },
+      {
+        "role": "assistant",
+        "content": "gotta earn my treats somehow"
+      },
+      {
+        "role": "user",
+        "content": "aight gng i see u"
+      },
+      {
+        "role": "assistant",
+        "content": "yeah I'm just chillin here waiting for something to happen"
+      }
+    ]
+  }
+}

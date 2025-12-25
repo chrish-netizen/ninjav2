@@ -1,0 +1,16 @@
+{
+  "name": "advanced-chatbot",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "discord.js": "^14.25.1",
+    "dotenv": "^17.2.3",
+    "groq": "^5.0.1",
+    "groq-sdk": "^0.9.1",
+    "readline": "^1.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "eslint": "^9.39.2"
+  }
+}
