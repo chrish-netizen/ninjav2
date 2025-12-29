@@ -12,11 +12,15 @@ import {
   TextDisplayBuilder,
   SeparatorBuilder,
   MediaGalleryBuilder,
+MediaGalleryItemBuilder,
+  SeparatorSpacingSize,
   MessageFlags
 } from 'discord.js';
 import fs from 'fs';
 import fetch from 'node-fetch';
 import blacklistData from "./blacklist.json" assert { type: "json" };
+import { ChannelType } from "discord.js";
+let lastRestartChannel = null;
 
 
 /* ===================== CONFIG ===================== */
@@ -51,6 +55,7 @@ const client = new Client({
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.MessageContent,
     GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.DirectMessages,
     GatewayIntentBits.GuildModeration,   // << REQUIRED FOR KICK/BAN
     GatewayIntentBits.GuildMessageReactions
   ],
@@ -68,6 +73,14 @@ const leaderboardPages = new Map();
 const userProfiles = new Map();
 const convoSummaries = new Map();
 
+
+let commandUsage;
+try {
+  commandUsage = JSON.parse(fs.readFileSync("./commandUsage.json", "utf8"));
+} catch {
+  commandUsage = {};
+  fs.writeFileSync("./commandUsage.json", JSON.stringify(commandUsage, null, 2));
+}
 
 const blacklist = new Map(Object.entries(blacklistData));
 
@@ -166,7 +179,7 @@ function systemPrompt(profile, intent, summary) {
 You are "Seylun's ninja", chatting in a Discord server.
 
 Personality:
-- upbeat, happy, straightforward, slightly dry humor.
+- upbeat, happy, willing to chat funny.
 - No cryptic or mysterious answers unless the user asks for it.
 - Keep responses clear and grounded.
 
@@ -174,7 +187,12 @@ Personality:
 Behavior rules:
 - Respond in funny upbeat language.
 - Max 3 short sentences.
-- when asked who is your owner reply with my owner is <@1438381425584771244>
+- when asked who is your owner reply with my owner/creator is <@1438381425584771244> if you have any questions about me you can dm him!
+-never say @everyone or @here
+- answer all questions the user asks
+- try to be funny 
+- when asked how do i contact your owner respond with my owners user name is: seyluns there you can contact him.
+
 - never have . at the end of sentances 
 Context:
 - Current mood: ${currentMood}
@@ -282,11 +300,13 @@ const sendContainer = (message, container) =>
 const HELP_CATEGORIES = {
   utility: {
     emoji: '🛠️', title: 'Utility Commands', commands: [
+      { name: 'serverinfo', desc: 'shows everything about the server' },
       { name: ',ping', desc: 'Check bot latency' },
       { name: ',info', desc: 'Bot info' },
       { name: ',avatar', desc: 'User avatar' },
       { name: ',userinfo', desc: 'User details' },
       { name: ',translate', desc: 'Translate a message' },
+      { name: ',ownerinfo', desc: 'show the owners info' },
       { name: ',uptime', desc: 'Bot uptime' }
     ]
   },
@@ -310,6 +330,7 @@ const HELP_CATEGORIES = {
       { name: ',cat', desc: 'Random cat image' },
       { name: ',dog', desc: 'Random dog image' },
       { name: ',bird', desc: 'Random bird image' },
+      { name: ',pokemon', desc: 'Rolls a random pokemon' },
       { name: ',fact', desc: 'Useless fact' }
     ]
   },
@@ -323,7 +344,8 @@ const HELP_CATEGORIES = {
       { name: ',unlock', desc: 'Unlock channel' },
       { name: ',timeout', desc: 'Timeout a user' },
       { name: ',mute', desc: 'Mute a user' },
-      { name: ',unmute', desc: 'Unmute a user' }
+      { name: ',unban', desc: 'unban a user' },
+     {  name:',unmute', desc: 'Unmute a user' }
     ]
   },
   owner: {
@@ -335,6 +357,8 @@ const HELP_CATEGORIES = {
       { name: ',forcekick', desc: 'Kick instantly' },
       { name: ',changemood', desc: 'Set bot mood' },
       { name: ',setstatus', desc: 'Set bot status' },
+      { name: ',dm', desc: 'dms a user or all guild owners' },
+      { name: ',restart', desc: 'restarts the bot safely' },
       { name: ',servers', desc: 'View servers + invites' }
     ]
   }
@@ -503,7 +527,11 @@ client.on('messageCreate', async (message) => {
     // Ignore bots / DMs
     if (message.author.bot || !message.guild) return;
 
+
+
+
     // ===================== AFK RETURN CHECK ===================== //
+
     await handleAfkReturn(message);
 
     // ===================== AFK MENTION CHECK ===================== //
@@ -571,9 +599,10 @@ client.on('messageCreate', async (message) => {
     const command = args.shift()?.toLowerCase();
 
     // ===================== BLACKLIST CHECK ===================== //
-    if (blacklist.has(message.author.id) && !isOwner(message)) {
-      return message.reply('You are blacklisted from using commands.').catch(() => { });
-    }
+  if (blacklist.has(message.author.id)) {
+    return message.reply("You are blacklisted from using these commands DM seyluns to appeal").catch(() => {}); }
+
+
 
     // ===================== SNIPE COMMANDS ===================== //
 
@@ -622,6 +651,336 @@ client.on('messageCreate', async (message) => {
 
       return message.reply('Snipe data cleared for this channel.').catch(() => { });
     }
+if (command === "ownerinfo") {
+  const owner = await client.users.fetch(BOT_OWNER_ID).catch(() => null);
+  if (!owner) return message.reply("Failed to fetch owner info.");
+
+  const aboutMe = `
+I’m Seylun the developer of this bot i love food and sleep i also love playing video games. Feel free to dm me on discord about the bot.
+  `.trim();
+
+  const embed = {
+    title: "👑 Bot Owner Information",
+    color: 0x2b2d31,
+    thumbnail: { url: owner.displayAvatarURL({ size: 1024 }) },
+    fields: [
+      {
+        name: "Username",
+        value: owner.tag,
+        inline: true
+      },
+      {
+        name: "User ID",
+        value: owner.id,
+        inline: true
+      },
+      {
+        name: "Account Created",
+        value: `<t:${Math.floor(owner.createdTimestamp / 1000)}:F>`,
+        inline: false
+      },
+      {
+        name: "About Me",
+        value: aboutMe,
+        inline: false
+      }
+    ],
+    footer: {
+      text: "Requested by " + message.author.tag
+    }
+  };
+
+  return message.reply({ embeds: [embed] });
+}
+
+
+if (command === "pokemon") {
+  try {
+    const id = Math.floor(Math.random() * 1025) + 1;
+    const response = await fetch("https://pokeapi.co/api/v2/pokemon/" + id);
+    
+    if (!response.ok) throw new Error("API error");
+    
+    const data = await response.json();
+    const name = data.name.charAt(0).toUpperCase() + data.name.slice(1);
+    const sprite = data.sprites.other["official-artwork"].front_default 
+      || data.sprites.front_default 
+      || "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/" + id + ".png";
+
+    const container = new ContainerBuilder()
+      .addTextDisplayComponents(
+        new TextDisplayBuilder().setContent("## A wild **" + name + "** appeared!")
+      )
+      .addSeparatorComponents(
+        new SeparatorBuilder()
+          .setSpacing(SeparatorSpacingSize.Small)
+          .setDivider(true)
+      )
+      .addMediaGalleryComponents(
+        new MediaGalleryBuilder().addItems(
+          new MediaGalleryItemBuilder().setURL(sprite)
+        )
+      )
+      .addTextDisplayComponents(
+        new TextDisplayBuilder().setContent("**Pokédex ID:** #" + id)
+      );
+
+    await message.reply({
+      components: [container],
+      flags: MessageFlags.IsComponentsV2,
+      allowedMentions: { repliedUser: false }
+    });
+
+  } catch (err) {
+    console.error(err);
+    await message.reply("Failed to load a Pokémon.");
+  }
+}
+
+if (message.content.toLowerCase() === ",serverinfo") {
+    const guild = message.guild;
+
+    const owner = await guild.fetchOwner();
+
+    const channels = guild.channels.cache;
+    const roles = guild.roles.cache;
+    const emojis = guild.emojis.cache;
+    const stickers = guild.stickers.cache;
+
+    const textChannels = channels.filter(c => c.type === 0).size;
+    const voiceChannels = channels.filter(c => c.type === 2).size;
+    const categories = channels.filter(c => c.type === 4).size;
+    const threads = channels.filter(c => c.isThread()).size;
+
+    const boosters = guild.members.cache.filter(m => m.premiumSince).size;
+
+    const afkChannel = guild.afkChannel ? `<#${guild.afkChannel.id}>` : "None";
+    const systemChannel = guild.systemChannel ? `<#${guild.systemChannel.id}>` : "None";
+    const rulesChannel = guild.rulesChannel ? `<#${guild.rulesChannel.id}>` : "None";
+    const updatesChannel = guild.publicUpdatesChannel ? `<#${guild.publicUpdatesChannel.id}>` : "None";
+
+    const components = [
+        new ContainerBuilder()
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(`## ${guild.name}`)
+            )
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing(SeparatorSpacingSize.Small)
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    `### General Information\n` +
+                    `**ID:** ${guild.id}\n` +
+                    `**Description:** ${guild.description ?? "None"}\n` +
+                    `**Owner:** ${owner}\n` +
+                    `**Members:** ${guild.memberCount}\n` +
+                    `**Created:** <t:${Math.floor(guild.createdTimestamp / 1000)}:F>\n` +
+                    `**Locale:** ${guild.preferredLocale}\n`
+                )
+            )
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing(SeparatorSpacingSize.Small)
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    `### Boosts\n` +
+                    `**Boost Level:** ${guild.premiumTier}\n` +
+                    `**Boost Count:** ${guild.premiumSubscriptionCount ?? 0}\n` +
+                    `**Boosters:** ${boosters}\n`
+                )
+            )
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing(SeparatorSpacingSize.Small)
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    `### Channels\n` +
+                    `**Total:** ${channels.size}\n` +
+                    `**Text:** ${textChannels}\n` +
+                    `**Voice:** ${voiceChannels}\n` +
+                    `**Categories:** ${categories}\n` +
+                    `**Threads:** ${threads}\n` +
+                    `**AFK Channel:** ${afkChannel}\n` +
+                    `**AFK Timeout:** ${guild.afkTimeout}s\n` +
+                    `**System Channel:** ${systemChannel}\n` +
+                    `**Rules Channel:** ${rulesChannel}\n` +
+                    `**Updates Channel:** ${updatesChannel}\n`
+                )
+            )
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing(SeparatorSpacingSize.Small)
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    `### Roles & Emojis\n` +
+                    `**Roles:** ${roles.size}\n` +
+                    `**Emojis:** ${emojis.size}\n` +
+                    `**Animated Emojis:** ${emojis.filter(e => e.animated).size}\n` +
+                    `**Stickers:** ${stickers.size}\n`
+                )
+            )
+    ];
+
+    await message.channel.send({
+        components,
+        flags: MessageFlags.IsComponentsV2 | MessageFlags.IsPersistent
+    });
+  }
+if (message.content.startsWith(",restart")) {
+    if (message.author.id !== "1438381425584771244") {
+        return message.reply("Only the bot owner can restart the bot.");
+    }
+
+    lastRestartChannel = message.channel.id;
+
+    const components = [
+        new ContainerBuilder()
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent("## 🔄 Restarting Bot")
+            )
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing(SeparatorSpacingSize.Small)
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(
+                    "The bot is now restarting safely..."
+                )
+            )
+    ];
+
+    await message.channel.send({
+        components,
+        flags: MessageFlags.IsComponentsV2 | MessageFlags.IsPersistent
+    });
+
+    console.log("Bot restart triggered by owner.");
+
+    setTimeout(() => {
+        process.exit(0);
+    }, 1500);
+}
+
+
+
+if (message.content.startsWith(",dm")) {
+    // OWNER ONLY
+    if (message.author.id !== "1438381425584771244"){
+        return message.reply("Only the bot owner can use this command.");
+    }
+
+    const args = message.content.split(" ").slice(1);
+    const target = args[0];
+
+    // Show usage embed if no args
+    if (!target) {
+        const usageEmbed = [
+            new ContainerBuilder()
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent("## 📬 DM Command Usage")
+                )
+                .addSeparatorComponents(
+                    new SeparatorBuilder()
+                        .setSpacing(SeparatorSpacingSize.Small)
+                        .setDivider(true)
+                )
+                .addTextDisplayComponents(
+                    new TextDisplayBuilder().setContent(
+                        "**Usage:**\n" +
+                        "`,dm @user your message` — DM a specific user\n" +
+                        "`,dm USER_ID your message` — DM a user by ID\n" +
+                        "`,dm all your message` — DM all server owners"
+                    )
+                )
+        ];
+
+        return await message.channel.send({
+            components: usageEmbed,
+            flags: MessageFlags.IsComponentsV2 | MessageFlags.IsPersistent
+        });
+    }
+
+    const dmText = args.slice(1).join(" ");
+
+    // DM container with footer
+    const dmContainer = [
+        new ContainerBuilder()
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent("## 📩 Message from the Bot Owner")
+            )
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing(SeparatorSpacingSize.Small)
+                    .setDivider(true)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder().setContent(`### ${dmText}`)
+            )
+            .addSeparatorComponents(
+                new SeparatorBuilder()
+                    .setSpacing(SeparatorSpacingSize.Small)
+                    .setDivider(false)
+            )
+            .addTextDisplayComponents(
+                new TextDisplayBuilder()
+                    .setContent("*This message cannot be replied to*")
+            )
+    ];
+
+    // DM all server owners
+    if (target === "all") {
+        let sent = 0;
+        for (const guild of message.client.guilds.cache.values()) {
+            try {
+                const owner = await guild.fetchOwner();
+                await owner.send({
+                    components: dmContainer,
+                    flags: MessageFlags.IsComponentsV2 | MessageFlags.IsPersistent
+                });
+                sent++;
+            } catch {}
+        }
+        return message.reply(`DM sent to ${sent} server owners.`);
+    }
+
+    // DM by mention
+    const mention = message.mentions.users.first();
+    if (mention) {
+        try {
+            await mention.send({
+                components: dmContainer,
+                flags: MessageFlags.IsComponentsV2 | MessageFlags.IsPersistent
+            });
+            return message.reply(`DM sent to ${mention.tag}.`);
+        } catch {
+            return message.reply("I couldn't DM that user.");
+        }
+    }
+
+    // DM by raw user ID
+    try {
+        const user = await message.client.users.fetch(target);
+        await user.send({
+            components: dmContainer,
+            flags: MessageFlags.IsComponentsV2 | MessageFlags.IsPersistent
+        });
+        return message.reply(`DM sent to user ID **${target}**.`);
+    } catch {
+        return message.reply("Invalid user ID or user cannot be DMed.");
+    }
+}
+
+
+
 
     // ===================== FUN COMMANDS ===================== //
 
@@ -1339,63 +1698,121 @@ client.on('messageCreate', async (message) => {
         return message.reply('Translation failed. API might be down.').catch(() => { });
       }
     }
+if (command === "unban") {
+  const target = args[0];
+
+  if (!target) {
+    return message.reply("You need to provide a user ID to unban.");
+  }
+
+  try {
+    const bans = await message.guild.bans.fetch();
+
+    // Try to find the ban entry
+    const banEntry =
+      bans.get(target) ||
+      bans.find((b) => b.user.tag === target) ||
+      bans.find((b) => b.user.username === target);
+
+    if (!banEntry) {
+      return message.reply("That user is not banned.");
+    }
+
+    const user = banEntry.user;
+
+    // Attempt DM (optional)
+    user.send(`You have been unbanned from **${message.guild.name}**.`).catch(() => {});
+
+    // Unban
+    await message.guild.members.unban(user.id, `Unbanned by ${message.author.tag}`);
+
+    // Confirmation
+    const container = new ContainerBuilder()
+      .setAccentColor(0x2b2d31)
+      .addTextDisplayComponents((t) =>
+        t.setContent(`**Unbanned:** ${user.tag} (${user.id})`)
+      )
+      .addSeparatorComponents((s) => s.setDivider(true))
+      .addTextDisplayComponents((t) =>
+        t.setContent(`Action performed by: ${message.author.tag}`)
+      );
+
+    return message.reply({
+      components: [container],
+      flags: MessageFlags.IsComponentsV2,
+      allowedMentions: { repliedUser: false }
+    });
+  } catch (err) {
+    console.error("UNBAN ERROR:", err);
+    return message.reply("Failed to unban that user.");
+  }
+}
 
     // ===================== OWNER / BLACKLIST / STATUS / MOOD ===================== //
 
-    if (command === 'blacklist') {
-      if (!isOwner(message)) {
-        return message.reply('Only my owner can use this command.').catch(() => { });
-      }
+// BLOCK BLACKLISTED USERS FROM USING COMMANDS OR THE CHATBOT
+if (blacklist.has(message.author.id)) {
+  return message.reply("You are blacklisted from using this bot.").catch(() => {});
+}
 
-      const target = message.mentions.users.first();
-      if (!target) return message.reply('Mention a user to blacklist.').catch(() => { });
+if (command === 'blacklist') {
+  if (!isOwner(message)) {
+    return message.reply('Only my owner can use this command.').catch(() => { });
+  }
 
-      blacklist.set(target.id, true);
-      saveDebounced(BLACKLIST_FILE, blacklist);
-      return message.reply(`Blacklisted <@${target.id}> globally.`).catch(() => { });
-    }
+  const target = message.mentions.users.first();
+  if (!target) return message.reply('Mention a user to blacklist.').catch(() => { });
 
-    if (command === 'unblacklist') {
-      if (!isOwner(message)) {
-        return message.reply('Only my owner can use this command.').catch(() => { });
-      }
+  blacklist.set(target.id, true);
+  saveDebounced(BLACKLIST_FILE, blacklist);
+  return message.reply(`Blacklisted <@${target.id}> globally.`).catch(() => { });
+}
 
-      const target = message.mentions.users.first();
-      if (!target) return message.reply('Mention a user to unblacklist.').catch(() => { });
+if (command === 'unblacklist') {
+  if (!isOwner(message)) {
+    return message.reply('Only my owner can use this command.').catch(() => { });
+  }
 
-      if (!blacklist.has(target.id)) {
-        return message.reply('That user is not blacklisted.').catch(() => { });
-      }
+  const target = message.mentions.users.first();
+  if (!target) return message.reply('Mention a user to unblacklist.').catch(() => { });
 
-      blacklist.delete(target.id);
-      saveDebounced(BLACKLIST_FILE, blacklist);
-      return message.reply(`Unblacklisted <@${target.id}> globally.`).catch(() => { });
-    }
+  if (!blacklist.has(target.id)) {
+    return message.reply('That user is not blacklisted.').catch(() => { });
+  }
 
-    if (command === 'blacklistcheck') {
-      if (!isOwner(message)) {
-        return message.reply('Only my owner can use this command.').catch(() => { });
-      }
+  blacklist.delete(target.id);
+  saveDebounced(BLACKLIST_FILE, blacklist);
+  return message.reply(`Unblacklisted <@${target.id}> globally.`).catch(() => { });
+}
 
-      const ids = Array.from(blacklist.keys());
+if (command === 'blacklistcheck') {
+  if (!isOwner(message)) {
+    return message.reply('Only my owner can use this command.').catch(() => { });
+  }
 
-      if (ids.length === 0) {
-        return message.reply('No users are currently blacklisted.').catch(() => { });
-      }
+  const ids = Array.from(blacklist.keys());
 
-      const list = ids.map((id) => `• <@${id}> (\`${id}\`)`).join('\n');
+  if (ids.length === 0) {
+    return message.reply('No users are currently blacklisted.').catch(() => { });
+  }
 
-      const container = new ContainerBuilder()
-        .setAccentColor(0x2b2d31)
-        .addTextDisplayComponents(
-          (text) => text.setContent('**🔒 Blacklisted Users**'),
-          (text) => text.setContent(list)
-        )
-        .addSeparatorComponents((sep) => sep.setDivider(true))
-        .addTextDisplayComponents((text) => text.setContent('-# Blacklist System'));
+  const list = ids.map((id) => `• <@${id}> (\`${id}\`)`).join('\n');
 
-      return message.reply({ components: [container], flags: MessageFlags.IsComponentsV2, allowedMentions: { repliedUser: false } }).catch(() => { });
-    }
+  const container = new ContainerBuilder()
+    .setAccentColor(0x2b2d31)
+    .addTextDisplayComponents(
+      (text) => text.setContent('**🔒 Blacklisted Users**'),
+      (text) => text.setContent(list)
+    )
+    .addSeparatorComponents((sep) => sep.setDivider(true))
+    .addTextDisplayComponents((text) => text.setContent('-# Blacklist System'));
+
+  return message.reply({
+    components: [container],
+    flags: MessageFlags.IsComponentsV2,
+    allowedMentions: { repliedUser: false }
+  }).catch(() => { });
+}
 
     if (command === 'changemood') {
       if (!isOwner(message)) return;
