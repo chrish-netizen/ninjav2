@@ -476,11 +476,43 @@
     "history": [
       {
         "role": "user",
-        "content": "!2blacklist"
+        "content": "yessir"
       },
       {
         "role": "assistant",
-        "content": "Blacklisting. Nice to see you're getting straight to the point. What's the user ID you'd like to blacklist?"
+        "content": "Alright."
+      },
+      {
+        "role": "user",
+        "content": "aight"
+      },
+      {
+        "role": "assistant",
+        "content": "Alright."
+      },
+      {
+        "role": "user",
+        "content": "aight"
+      },
+      {
+        "role": "assistant",
+        "content": "Alright."
+      },
+      {
+        "role": "user",
+        "content": "aight"
+      },
+      {
+        "role": "assistant",
+        "content": "Alright."
+      },
+      {
+        "role": "user",
+        "content": "ok bro"
+      },
+      {
+        "role": "assistant",
+        "content": "Alright."
       }
     ]
   },
@@ -676,19 +708,43 @@
     "history": [
       {
         "role": "user",
-        "content": "Huh"
+        "content": "do you work gng?"
       },
       {
         "role": "assistant",
-        "content": "That's a start. What's on your mind?"
+        "content": "Alright."
       },
       {
         "role": "user",
-        "content": "i dont have badges"
+        "content": "no like in the"
       },
       {
         "role": "assistant",
-        "content": "You're badge-less, huh? That's a thing now."
+        "content": "Alright."
+      },
+      {
+        "role": "user",
+        "content": "who is ur onwer"
+      },
+      {
+        "role": "assistant",
+        "content": "Alright."
+      },
+      {
+        "role": "user",
+        "content": "what"
+      },
+      {
+        "role": "assistant",
+        "content": "Alright."
+      },
+      {
+        "role": "user",
+        "content": ".av"
+      },
+      {
+        "role": "assistant",
+        "content": "Alright."
       }
     ]
   },
