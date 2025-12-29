@@ -331,6 +331,7 @@ const HELP_CATEGORIES = {
       { name: ',dog', desc: 'Random dog image' },
       { name: ',bird', desc: 'Random bird image' },
       { name: ',pokemon', desc: 'Rolls a random pokemon' },
+      { name: ',ship', desc: 'ship 2 users' },
       { name: ',fact', desc: 'Useless fact' }
     ]
   },
@@ -692,6 +693,43 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
 
   return message.reply({ embeds: [embed] });
 }
+
+if (command === "ship") {
+  const users = message.mentions.users;
+
+  if (users.size < 2) {
+    return message.reply("Mention **two** users to ship.").catch(() => {});
+  }
+
+  const [user1, user2] = users.map(u => u);
+
+  const percentage = Math.floor(Math.random() * 101);
+
+  let status;
+  if (percentage > 85) status = "💖 Perfect Match!";
+  else if (percentage > 60) status = "💘 Strong Potential!";
+  else if (percentage > 40) status = "💞 Could Work!";
+  else if (percentage > 20) status = "💛 Maybe…?";
+  else status = "💔 Not Looking Good…";
+
+  const container = new ContainerBuilder()
+    .setAccentColor(0x2b2d31) // clean grey
+    .addTextDisplayComponents(
+      (text) => text.setContent(`## 💞 Shipping ${user1.username} × ${user2.username}`),
+      (text) => text.setContent(`**Compatibility:** ${percentage}%\n${status}`)
+    )
+    .addSeparatorComponents((sep) => sep.setDivider(true))
+    .addTextDisplayComponents(
+      (text) => text.setContent("-# Ship System")
+    );
+
+  return message.reply({
+    components: [container],
+    flags: MessageFlags.IsComponentsV2,
+    allowedMentions: { repliedUser: false }
+  }).catch(() => {});
+}
+
 
 
 if (command === "pokemon") {
