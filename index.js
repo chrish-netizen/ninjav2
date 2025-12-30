@@ -777,34 +777,24 @@ if (command === "predictdeath") {
   let prophecy = generateProphecy();
 
   function buildContainer() {
-    return new ContainerBuilder()
-      .addTextDisplayComponent(
-        new TextDisplayBuilder().setContent(`## 🔮 Prophecy for ${target.username}`)
-      )
-      .addSeparatorComponent(
-        new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true)
-      )
-      .addTextDisplayComponent(
-        new TextDisplayBuilder().setContent(`**Cause:** ${prophecy.cause}`)
-      )
-      .addTextDisplayComponent(
-        new TextDisplayBuilder().setContent(`**Location:** ${prophecy.location}`)
-      )
-      .addTextDisplayComponent(
-        new TextDisplayBuilder().setContent(`**Predicted Time:** ${prophecy.date}`)
-      )
-      .addSeparatorComponent(
-        new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true)
-      )
-      .addTextDisplayComponent(
-        new TextDisplayBuilder().setContent(`**Warning:** ${prophecy.warning}`)
-      )
-      .addButtonComponent(
-        new ButtonBuilder()
-          .setCustomId("predictdeath_reroll")
-          .setLabel("Reroll Prophecy")
-          .setStyle(ButtonStyle.Secondary)
-      );
+    return new ContainerBuilder().setComponents([
+      new TextDisplayBuilder().setContent(`## 🔮 Prophecy for ${target.username}`),
+
+      new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+
+      new TextDisplayBuilder().setContent(`**Cause:** ${prophecy.cause}`),
+      new TextDisplayBuilder().setContent(`**Location:** ${prophecy.location}`),
+      new TextDisplayBuilder().setContent(`**Predicted Time:** ${prophecy.date}`),
+
+      new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
+
+      new TextDisplayBuilder().setContent(`**Warning:** ${prophecy.warning}`),
+
+      new ButtonBuilder()
+        .setCustomId("predictdeath_reroll")
+        .setLabel("Reroll Prophecy")
+        .setStyle(ButtonStyle.Secondary)
+    ]);
   }
 
   const msg = await message.reply({
@@ -825,6 +815,7 @@ if (command === "predictdeath") {
     });
   });
 }
+
 
 
 
@@ -2172,6 +2163,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
