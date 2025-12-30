@@ -710,25 +710,50 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
       }).catch(() => { });
     }
 
-if (command === "spotify") {
-  const target = message.mentions.users.first() || message.author;
+const cooldowns = new Map(); // userId → timestamp
 
-  const presence = target.presence;
-  const activity = presence?.activities?.find(a => a.type === 2 && a.name === "Spotify");
+if (command === "memberdm") {
+  const senderId = message.author.id;
+  const now = Date.now();
 
-  // Minimal grey placeholder image
-  const placeholderArt = "https://i.imgur.com/4M34hi2.png";
+  if (cooldowns.has(senderId)) {
+    const lastUsed = cooldowns.get(senderId);
+    const diff = (now - lastUsed) / 1000;
 
-  if (!activity) {
+    if (diff < 20) {
+      const container = new ContainerBuilder()
+        .setAccentColor(0x2b2d31)
+        .addTextDisplayComponents(
+          (text) => text.setContent(`## ⏳ Cooldown Active`),
+          (text) => text.setContent(`Please wait **${Math.ceil(20 - diff)} seconds** before using this command again.`)
+        )
+        .addSeparatorComponents((sep) => sep.setDivider(true))
+        .addTextDisplayComponents(
+          (text) => text.setContent("-# Member DM System")
+        );
+
+      return message.reply({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        allowedMentions: { repliedUser: false }
+      }).catch(() => {});
+    }
+  }
+
+  const args = message.content.split(" ").slice(1);
+  const targetId = args[0]?.replace(/[<@!>]/g, "");
+  const dmContent = args.slice(1).join(" ");
+
+  if (!targetId || !dmContent) {
     const container = new ContainerBuilder()
-      .setAccentColor(0x1DB954)
+      .setAccentColor(0x2b2d31)
       .addTextDisplayComponents(
-        (text) => text.setContent(`## 🎧 Spotify Status for ${target.username}`),
-        (text) => text.setContent(`This user is **not listening to Spotify** right now.`)
+        (text) => text.setContent(`## 📩 Usage Error`),
+        (text) => text.setContent(`Use: \`,memberdm @user your message here\``)
       )
       .addSeparatorComponents((sep) => sep.setDivider(true))
       .addTextDisplayComponents(
-        (text) => text.setContent("-# Spotify Presence System")
+        (text) => text.setContent("-# Member DM System")
       );
 
     return message.reply({
@@ -738,30 +763,26 @@ if (command === "spotify") {
     }).catch(() => {});
   }
 
-  const track = activity.details || "Unknown Track";
-  const artist = activity.state || "Unknown Artist";
-  const album = activity.assets?.largeText || "Unknown Album";
-  const albumArt = activity.assets?.largeImageURL() || placeholderArt;
+  const target = await message.client.users.fetch(targetId).catch(() => null);
+  if (!target) {
+    return message.reply("Could not find that user.").catch(() => {});
+  }
+
+  await target.send(`📬 Message from ${message.author.tag}:\n\n${dmContent}`).catch(() => {
+    return message.reply("Failed to send DM.").catch(() => {});
+  });
+
+  cooldowns.set(senderId, now);
 
   const container = new ContainerBuilder()
-    .setAccentColor(0x1DB954)
-    .addMediaGalleryComponents(
-      (gallery) =>
-        gallery.addItems(
-          new MediaGalleryItemBuilder()
-            .setSrc(albumArt)
-            .setAlt("Album Art")
-        )
-    )
+    .setAccentColor(0x2b2d31)
     .addTextDisplayComponents(
-      (text) => text.setContent(`## 🎧 Now Playing on Spotify`),
-      (text) => text.setContent(`**Track:** ${track}`),
-      (text) => text.setContent(`**Artist:** ${artist}`),
-      (text) => text.setContent(`**Album:** ${album}`)
+      (text) => text.setContent(`## ✅ DM Sent`),
+      (text) => text.setContent(`Your message was sent to **${target.username}**.`)
     )
     .addSeparatorComponents((sep) => sep.setDivider(true))
     .addTextDisplayComponents(
-      (text) => text.setContent(`Listening as **${target.username}**`)
+      (text) => text.setContent("-# Member DM System")
     );
 
   return message.reply({
@@ -770,6 +791,7 @@ if (command === "spotify") {
     allowedMentions: { repliedUser: false }
   }).catch(() => {});
 }
+
 
 
 if (command === "prophecy") {
@@ -2188,6 +2210,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
