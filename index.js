@@ -475,26 +475,6 @@ async function handleAfkReturn(message) {
   afkActive.delete(userId);
   await deleteAfkActive(userId);
 
-  // Restore nickname ONLY if:
-  // - Bot changed it earlier
-  // - Bot has permission
-  // - Member still exists
-  try {
-    const member = await message.guild.members.fetch(userId).catch(() => null);
-
-    if (member && member.manageable && data.hadNicknameChange) {
-      if (data.originalNickname) {
-        // User had a nickname before AFK → restore it
-        await member.setNickname(data.originalNickname).catch(() => { });
-      } else {
-        // User had NO nickname before AFK → reset to null
-        await member.setNickname(null).catch(() => { });
-      }
-    }
-  } catch {
-    // Ignore nickname restore errors
-  }
-
   // Send welcome back container
   const container = new ContainerBuilder()
     .setAccentColor(0x2b2d31)
@@ -1413,27 +1393,9 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
         return message.reply('You are already marked as AFK.').catch(() => { });
       }
 
-      let originalNickname = null;
-      let hadNicknameChange = false;
-
-      try {
-        const member = await message.guild.members.fetch(userId).catch(() => null);
-        if (member && member.manageable) {
-          originalNickname = member.nickname || member.user.username;
-
-          if (!originalNickname.toLowerCase().includes('[afk]')) {
-            const newNick = `[AFK] ${originalNickname}`;
-            await member.setNickname(newNick).catch(() => { });
-            hadNicknameChange = true;
-          }
-        }
-      } catch { }
-
       const afkSession = {
         since: now,
-        reason,
-        originalNickname,
-        hadNicknameChange
+        reason
       };
 
       // Save to both memory (for fast access) and MongoDB (for persistence)
