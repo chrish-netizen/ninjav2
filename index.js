@@ -719,23 +719,35 @@ const cooldowns = new Map(); // userId → timestamp
     if (command === "pp") {
   const target = message.mentions.users.first() || message.author;
 
-  const quotes = [
-    "wow… that’s a short one",
-    "a respectable size",
-    "bro calm down",
-    "this should be illegal",
-    "scientists fear this thing",
-    "that’s basically DLC content",
-    "this is a war crime",
-    "that’s adorable",
-    "calm down, monster",
-    "this violates several treaties"
-  ];
-
   const length = Math.floor(Math.random() * 20) + 1; // 1–20
   const shaft = "=".repeat(length);
   const pp = `3${shaft}D`;
-  const quote = quotes[Math.floor(Math.random() * quotes.length)];
+
+  // Fixed quote per length
+  const quoteMap = {
+    1: "that’s adorable",
+    2: "wow… that’s a short one",
+    3: "a respectable size",
+    4: "bro calm down",
+    5: "this should be illegal",
+    6: "scientists fear this thing",
+    7: "that’s basically DLC content",
+    8: "this is a war crime",
+    9: "calm down, monster",
+    10: "this violates several treaties",
+    11: "this is a medical anomaly",
+    12: "this broke the scanner",
+    13: "this is a myth",
+    14: "this is a cosmic event",
+    15: "this is a dimensional breach",
+    16: "this is forbidden knowledge",
+    17: "this is a divine artifact",
+    18: "this is a universal constant",
+    19: "this is the final form",
+    20: "this is the end of measurement"
+  };
+
+  const quote = quoteMap[length] || "unmeasurable";
 
   const container = new ContainerBuilder()
     .setAccentColor(0x2b2d31)
@@ -756,73 +768,6 @@ const cooldowns = new Map(); // userId → timestamp
   }).catch(() => {});
 }
 
-
-if (command === "aura") {
-  const target = message.mentions.users.first() || message.author;
-
-  const colors = [
-    "a soft **Silver Mist**",
-    "a warm **Rose Quartz glow**",
-    "a deep **Indigo haze**",
-    "a flicker of **Golden Ember**",
-    "a gentle **Verdant shimmer**",
-    "a protective **Obsidian veil**"
-  ];
-
-  const flows = [
-    "drifting in quiet currents",
-    "blooming outward with gentle intention",
-    "spiraling in layered, thoughtful patterns",
-    "fracturing softly as it heals and reforms",
-    "radiating with steady, patient warmth",
-    "submerged in deep, introspective calm"
-  ];
-
-  const echoes = [
-    "a faint hum that lingers in the air",
-    "a soft warmth that trails behind them",
-    "a shimmer that fades like a memory",
-    "a quiet pulse beneath the surface",
-    "a ripple that settles into stillness",
-    "a whisper of light that drifts away"
-  ];
-
-  const insights = [
-    "Your energy is shifting toward clarity.",
-    "You’re carrying something unspoken but gentle.",
-    "Your presence is preparing for renewal.",
-    "You’re holding more strength than you realize.",
-    "Your path is aligning with quiet purpose.",
-    "Your aura is softening into balance."
-  ];
-
-  const auraColor = colors[Math.floor(Math.random() * colors.length)];
-  const auraFlow = flows[Math.floor(Math.random() * flows.length)];
-  const auraEcho = echoes[Math.floor(Math.random() * echoes.length)];
-  const auraInsight = insights[Math.floor(Math.random() * insights.length)];
-
-  const paragraph =
-    `The aura surrounding **${target.username}** appears as ${auraColor}, ` +
-    `${auraFlow}, leaving behind ${auraEcho}. ` +
-    `${auraInsight}`;
-
-  const container = new ContainerBuilder()
-    .setAccentColor(0x2b2d31) // light grey accent line
-    .addTextDisplayComponents(
-      (text) => text.setContent(`## 🌫️ Aura Reading for ${target.username}`),
-      (text) => text.setContent(paragraph)
-    )
-    .addSeparatorComponents((sep) => sep.setDivider(true))
-    .addTextDisplayComponents(
-      (text) => text.setContent("-# Aura Reading System")
-    );
-
-  return message.reply({
-    components: [container],
-    flags: MessageFlags.IsComponentsV2,
-    allowedMentions: { repliedUser: false }
-  }).catch(() => {});
-}
 
 
     
@@ -2324,6 +2269,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
