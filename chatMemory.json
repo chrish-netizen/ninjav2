@@ -476,30 +476,6 @@
     "history": [
       {
         "role": "user",
-        "content": "aight"
-      },
-      {
-        "role": "assistant",
-        "content": "Alright."
-      },
-      {
-        "role": "user",
-        "content": "ok bro"
-      },
-      {
-        "role": "assistant",
-        "content": "Alright."
-      },
-      {
-        "role": "user",
-        "content": ""
-      },
-      {
-        "role": "assistant",
-        "content": "What's up"
-      },
-      {
-        "role": "user",
         "content": "not muchh"
       },
       {
@@ -513,6 +489,30 @@
       {
         "role": "assistant",
         "content": "Girl boss mode activated"
+      },
+      {
+        "role": "user",
+        "content": "1639482"
+      },
+      {
+        "role": "assistant",
+        "content": "That's my ID"
+      },
+      {
+        "role": "user",
+        "content": "what number did i just give you also that isn't your id"
+      },
+      {
+        "role": "assistant",
+        "content": "You gave me 1639482, and that's not my ID, I'm a ninja"
+      },
+      {
+        "role": "user",
+        "content": "do you remember chats?"
+      },
+      {
+        "role": "assistant",
+        "content": "I remember this chat, but I don't keep any records"
       }
     ]
   },
