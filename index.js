@@ -1,10 +1,19 @@
 import 'dotenv/config';
-import './webserver.js';
+import { startWebserver } from './webserver.js';
+import {
+  connectDB,
+  getAfkData, setAfkData, getAllAfkData, deleteAfkData,
+  getMsgCount, incrementMsgCount, getAllMsgCounts,
+  getChatMemory, setChatMemory,
+  getUserProfile, setUserProfile,
+  getConvoSummary, setConvoSummary,
+  isBlacklisted, addToBlacklist, removeFromBlacklist, getAllBlacklist,
+  getCommandUsage, incrementCommandUsage
+} from './database.js';
 import {
   Client,
   GatewayIntentBits,
   Partials,
-  ActionRowBuilder,
   StringSelectMenuBuilder,
   ButtonBuilder,
   ButtonStyle,
@@ -17,22 +26,13 @@ import {
   SeparatorSpacingSize,
   MessageFlags
 } from 'discord.js';
-import fs from 'fs';
 import fetch from 'node-fetch';
-import blacklistData from "./storage/blacklist.json" with { type: "json" };
-import { ChannelType } from "discord.js";
 let lastRestartChannel = null;
 
 
 /* ===================== CONFIG ===================== */
 
 const PREFIX = ',';
-const MSG_FILE = './storage/msgData.json';
-const AFK_FILE = './storage/afkData.json';
-const MEMORY_FILE = './storage/chatMemory.json';
-const PROFILE_FILE = './storage/userProfiles.json';
-const SUMMARY_FILE = './storage/convoSummaries.json';
-const BLACKLIST_FILE = './storage/blacklist.json';
 
 const { TOKEN, GROQ_API_KEY } = process.env;
 
@@ -63,28 +63,14 @@ const client = new Client({
   partials: [Partials.Channel]
 });
 
+// Start the webserver
+startWebserver(client);
 
-/* ===================== STORAGE ===================== */
+
+/* ===================== STORAGE (In-Memory Cache) ===================== */
 
 const afkActive = new Map();
-const afkTotals = new Map();
-const msgCounts = new Map();
-const chatMemory = new Map();
 const leaderboardPages = new Map();
-const userProfiles = new Map();
-const convoSummaries = new Map();
-
-
-let commandUsage;
-try {
-  commandUsage = JSON.parse(fs.readFileSync("./commandUsage.json", "utf8"));
-} catch {
-  commandUsage = {};
-  fs.writeFileSync("./commandUsage.json", JSON.stringify(commandUsage, null, 2));
-}
-
-const blacklist = new Map(Object.entries(blacklistData));
-
 const snipes = new Map();
 
 let currentMood = 'Neutral';
@@ -115,56 +101,40 @@ const lores = [
 
 
 
-/* ===================== LOAD FILES ===================== */
+/* ===================== CONNECT TO MONGODB ===================== */
 
-for (const [file, map] of [
-  [AFK_FILE, afkTotals],
-  [MSG_FILE, msgCounts],
-  [MEMORY_FILE, chatMemory],
-  [PROFILE_FILE, userProfiles],
-  [BLACKLIST_FILE, blacklist],
-  [SUMMARY_FILE, convoSummaries]
-]) {
-  if (fs.existsSync(file)) {
-    const raw = fs.readFileSync(file, 'utf8');
-    if (raw.trim().length) {
-      Object.entries(JSON.parse(raw)).forEach(([k, v]) => map.set(k, v));
-    }
-  }
-}
-
-
-
-
-
-/* ===================== SAVE (DEBOUNCED) ===================== */
-
-const saveTimers = new Map();
-
-function saveDebounced(file, map) {
-  if (saveTimers.has(file)) clearTimeout(saveTimers.get(file));
-
-  const timer = setTimeout(() => {
-    fs.writeFileSync(file, JSON.stringify(Object.fromEntries(map), null, 2));
-    saveTimers.delete(file);
-  }, 250);
-
-  saveTimers.set(file, timer);
-}
+await connectDB();
 
 /* ===================== AI CORE ===================== */
 
-function getMemory(key) {
-  if (!chatMemory.has(key)) chatMemory.set(key, { history: [] });
-  return chatMemory.get(key);
+// In-memory cache for chat sessions (cleared on restart)
+const chatMemoryCache = new Map();
+const userProfileCache = new Map();
+
+async function getMemory(key) {
+  if (!chatMemoryCache.has(key)) {
+    const memory = await getChatMemory(key);
+    chatMemoryCache.set(key, memory);
+  }
+  return chatMemoryCache.get(key);
 }
 
+async function saveMemory(key, memory) {
+  chatMemoryCache.set(key, memory);
+  await setChatMemory(key, memory);
+}
 
-function getProfile(key) {
-  if (!userProfiles.has(key)) {
-    userProfiles.set(key, { facts: [], style: 'normal' });
+async function getProfile(key) {
+  if (!userProfileCache.has(key)) {
+    const profile = await getUserProfile(key);
+    userProfileCache.set(key, profile);
   }
-  return userProfiles.get(key);
+  return userProfileCache.get(key);
+}
+
+async function saveProfile(key, profile) {
+  userProfileCache.set(key, profile);
+  await setUserProfile(key, profile);
 }
 
 function detectIntent(text) {
@@ -203,10 +173,10 @@ Context:
 }
 
 async function groqReply(key, input) {
-  const mem = getMemory(key);
-  const profile = getProfile(key);
+  const mem = await getMemory(key);
+  const profile = await getProfile(key);
   const intent = detectIntent(input || '');
-  const summary = convoSummaries.get(key);
+  const summary = await getConvoSummary(key);
 
   /* === AI OWNER LOGIC REMOVED === */
 
@@ -236,7 +206,7 @@ async function groqReply(key, input) {
   mem.history.push({ role: 'assistant', content: reply });
   mem.history = mem.history.slice(-10);
 
-  saveDebounced(MEMORY_FILE, chatMemory);
+  await saveMemory(key, mem);
 
   return reply;
 }
@@ -482,9 +452,9 @@ async function handleAfkReturn(message) {
   const data = afkActive.get(userId);
   const duration = Date.now() - data.since;
 
-  // Add AFK time to totals
-  const prev = afkTotals.get(userId) || 0;
-  afkTotals.set(userId, prev + duration);
+  // Add AFK time to totals in MongoDB
+  const prev = await getAfkData(userId) || 0;
+  await setAfkData(userId, prev + duration);
 
   // Remove AFK state
   afkActive.delete(userId);
@@ -565,11 +535,11 @@ client.on('messageCreate', async (message) => {
 
     // ===================== MESSAGE COUNT TRACKING ===================== //
     const key = `${message.guild.id}:${message.author.id}`;
-    msgCounts.set(key, (msgCounts.get(key) || 0) + 1);
-    saveDebounced(MSG_FILE, msgCounts);
+    incrementMsgCount(key).catch(err => console.error('Failed to increment msg count:', err));
 
     // ===================== BLACKLIST CHECK (mentions/replies) ===================== //
-    if (message.mentions.users.has(client.user.id) && blacklist.has(message.author.id) && !isOwner(message)) {
+    const userBlacklisted = await isBlacklisted(message.author.id);
+    if (message.mentions.users.has(client.user.id) && userBlacklisted && !isOwner(message)) {
       return message.reply("You are blacklisted from interacting with this bot. DM seyluns to appeal").catch(() => { });
     }
 
@@ -606,7 +576,8 @@ client.on('messageCreate', async (message) => {
     const command = args.shift()?.toLowerCase();
 
     // ===================== BLACKLIST CHECK ===================== //
-    if (blacklist.has(message.author.id) && !isOwner(message)) {
+    const cmdUserBlacklisted = await isBlacklisted(message.author.id);
+    if (cmdUserBlacklisted && !isOwner(message)) {
       return message.reply("You are blacklisted from using these commands DM seyluns to appeal").catch(() => { });
     }
 
@@ -1398,7 +1369,6 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
       const apiLatency = Math.round(client.ws.ping);
 
       const container = new ContainerBuilder()
-        .setAccentColor(0x2b2d31)
         .addTextDisplayComponents(
           (text) => text.setContent('**🏓 Pong!**'),
           (text) => text.setContent(`⚡ **Latency:** ${latency}ms\n📡 **API Latency:** ${apiLatency}ms`)
@@ -1464,6 +1434,7 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
 
 
     if (command === 'afklb') {
+      const afkTotals = await getAllAfkData();
       const entries = Array.from(afkTotals.entries())
         .filter(([_, ms]) => ms > 0)
         .sort((a, b) => b[1] - a[1]);
@@ -1479,9 +1450,9 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
       const start = page * pageSize;
       const pageEntries = entries.slice(start, start + pageSize);
 
-      const lines = pageEntries.map(([userId, totalMs], i) => {
+      const lines = pageEntries.map(([oduserId, totalMs], i) => {
         const rank = start + i + 1;
-        return `**${rank}.** <@${userId}> — ${formatDuration(totalMs)}`;
+        return `**${rank}.** <@${oduserId}> — ${formatDuration(totalMs)}`;
       });
 
       const container = new ContainerBuilder()
@@ -1514,14 +1485,15 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
     // ===================== LEADERBOARD COMMANDS ===================== //
 
     if (command === 'msglb') {
+      const msgCounts = await getAllMsgCounts();
       const entries = Array.from(msgCounts.entries())
         .filter(([k, count]) => {
           const [guildId] = k.split(':');
           return guildId === message.guild.id && count > 0;
         })
         .map(([k, count]) => {
-          const userId = k.split(':')[1];
-          return [userId, count];
+          const oduserId = k.split(':')[1];
+          return [oduserId, count];
         })
         .sort((a, b) => b[1] - a[1]);
 
@@ -1536,9 +1508,9 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
       const start = page * pageSize;
       const pageEntries = entries.slice(start, start + pageSize);
 
-      const lines = pageEntries.map(([userId, count], i) => {
+      const lines = pageEntries.map(([oduserId, count], i) => {
         const rank = start + i + 1;
-        return `**${rank}.** <@${userId}> — **${count} messages**`;
+        return `**${rank}.** <@${oduserId}> — **${count} messages**`;
       });
 
       const container = new ContainerBuilder()
@@ -1858,7 +1830,8 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
     // ===================== OWNER / BLACKLIST / STATUS / MOOD ===================== //
 
     // BLOCK BLACKLISTED USERS FROM USING COMMANDS OR THE CHATBOT
-    if (blacklist.has(message.author.id)) {
+    const ownerBlacklistCheck = await isBlacklisted(message.author.id);
+    if (ownerBlacklistCheck) {
       return message.reply("You are blacklisted from using this bot.").catch(() => { });
     }
 
@@ -1870,8 +1843,7 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
       const target = message.mentions.users.first();
       if (!target) return message.reply('Mention a user to blacklist.').catch(() => { });
 
-      blacklist.set(target.id, true);
-      saveDebounced(BLACKLIST_FILE, blacklist);
+      await addToBlacklist(target.id, 'Blacklisted by owner');
       return message.reply(`Blacklisted <@${target.id}> globally.`).catch(() => { });
     }
 
@@ -1883,12 +1855,12 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
       const target = message.mentions.users.first();
       if (!target) return message.reply('Mention a user to unblacklist.').catch(() => { });
 
-      if (!blacklist.has(target.id)) {
+      const targetBlacklisted = await isBlacklisted(target.id);
+      if (!targetBlacklisted) {
         return message.reply('That user is not blacklisted.').catch(() => { });
       }
 
-      blacklist.delete(target.id);
-      saveDebounced(BLACKLIST_FILE, blacklist);
+      await removeFromBlacklist(target.id);
       return message.reply(`Unblacklisted <@${target.id}> globally.`).catch(() => { });
     }
 
@@ -1897,7 +1869,8 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
         return message.reply('Only my owner can use this command.').catch(() => { });
       }
 
-      const ids = Array.from(blacklist.keys());
+      const blacklistMap = await getAllBlacklist();
+      const ids = Array.from(blacklistMap.keys());
 
       if (ids.length === 0) {
         return message.reply('No users are currently blacklisted.').catch(() => { });
@@ -2024,18 +1997,20 @@ client.on('interactionCreate', async (interaction) => {
       let entries;
 
       if (isAfk) {
+        const afkTotals = await getAllAfkData();
         entries = Array.from(afkTotals.entries())
           .filter(([_, ms]) => ms > 0)
           .sort((a, b) => b[1] - a[1]);
       } else if (isMsg) {
+        const msgCounts = await getAllMsgCounts();
         entries = Array.from(msgCounts.entries())
           .filter(([k, count]) => {
             const [guildId] = k.split(':');
             return guildId === interaction.guild.id && count > 0;
           })
           .map(([k, count]) => {
-            const userId = k.split(':')[1];
-            return [userId, count];
+            const oduserId = k.split(':')[1];
+            return [oduserId, count];
           })
           .sort((a, b) => b[1] - a[1]);
       }
@@ -2052,10 +2027,10 @@ client.on('interactionCreate', async (interaction) => {
       const start = page * pageSize;
       const pageEntries = entries.slice(start, start + pageSize);
 
-      const lines = pageEntries.map(([userId, value], i) => {
+      const lines = pageEntries.map(([oduserId, value], i) => {
         const rank = start + i + 1;
-        if (isAfk) return `**${rank}.** <@${userId}> — ${formatDuration(value)}`;
-        if (isMsg) return `**${rank}.** <@${userId}> — **${value} messages**`;
+        if (isAfk) return `**${rank}.** <@${oduserId}> — ${formatDuration(value)}`;
+        if (isMsg) return `**${rank}.** <@${oduserId}> — **${value} messages**`;
       });
 
       const botName = client.user.username;
