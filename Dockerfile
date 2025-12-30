@@ -13,10 +13,10 @@ RUN npm install --production
 # Copy application files
 COPY . .
 
-# Create volume mount points for persistent data
-VOLUME ["/app/data"]
+# Create storage directory for persistent data
+RUN mkdir -p /app/storage
 
-# Set environment variables (these will be overridden by docker run or docker-compose)
+# Set environment variables
 ENV NODE_ENV=production
 
 # Run the bot

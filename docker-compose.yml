@@ -8,12 +8,5 @@ services:
     env_file:
       - .env
     volumes:
-      # Mount JSON data files to persist data
-      - ./afkData.json:/app/afkData.json
-      - ./blacklist.json:/app/blacklist.json
-      - ./chatMemory.json:/app/chatMemory.json
-      - ./commandUsage.json:/app/commandUsage.json
-      - ./convoSummaries.json:/app/convoSummaries.json
-      - ./memory.json:/app/memory.json
-      - ./msgData.json:/app/msgData.json
-      - ./userProfiles.json:/app/userProfiles.json
+      # Mount storage directory to persist all data
+      - ./storage:/app/storage

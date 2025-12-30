@@ -4,15 +4,8 @@ node_modules/
 # Environment variables
 .env
 
-# stroage files
-
-afkData.json
-blacklist.json
-chatmemory.json
-commandUsage.json
-memory.json
-msgData.json
-UserProfiles.json
+# Storage files (user data should not be committed)
+storage/*.json
 
 # IDE/Editor
 .vscode/

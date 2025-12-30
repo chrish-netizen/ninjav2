@@ -18,7 +18,7 @@ import {
 } from 'discord.js';
 import fs from 'fs';
 import fetch from 'node-fetch';
-import blacklistData from "./blacklist.json" with { type: "json" };
+import blacklistData from "./storage/blacklist.json" with { type: "json" };
 import { ChannelType } from "discord.js";
 let lastRestartChannel = null;
 
@@ -26,12 +26,12 @@ let lastRestartChannel = null;
 /* ===================== CONFIG ===================== */
 
 const PREFIX = ',';
-const MSG_FILE = './msgData.json';
-const AFK_FILE = './afkData.json';
-const MEMORY_FILE = './chatMemory.json';
-const PROFILE_FILE = './userProfiles.json';
-const SUMMARY_FILE = './convoSummaries.json';
-const BLACKLIST_FILE = './blacklist.json';
+const MSG_FILE = './storage/msgData.json';
+const AFK_FILE = './storage/afkData.json';
+const MEMORY_FILE = './storage/chatMemory.json';
+const PROFILE_FILE = './storage/userProfiles.json';
+const SUMMARY_FILE = './storage/convoSummaries.json';
+const BLACKLIST_FILE = './storage/blacklist.json';
 
 const { TOKEN, GROQ_API_KEY } = process.env;
 
