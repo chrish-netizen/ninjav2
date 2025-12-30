@@ -763,22 +763,22 @@ if (command === "prophecy") {
   let prophecy = generate();
 
   function buildContainer() {
-    return new ContainerBuilder().setComponents([
+    const container = new ContainerBuilder();
+
+    container.addComponents(
       new TextDisplayBuilder().setContent(`## 🔮 Prophecy for ${target.username}`),
-
       new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
-
       new TextDisplayBuilder().setContent(`**Vision:** ${prophecy.vision}`),
       new TextDisplayBuilder().setContent(`**Omen:** ${prophecy.omen}`),
       new TextDisplayBuilder().setContent(`**Outcome:** ${prophecy.outcome}`),
-
       new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true),
-
       new ButtonBuilder()
         .setCustomId("prophecy_reroll")
         .setLabel("Reveal Another Prophecy")
         .setStyle(ButtonStyle.Secondary)
-    ]);
+    );
+
+    return container;
   }
 
   const msg = await message.reply({
@@ -790,6 +790,7 @@ if (command === "prophecy") {
 
   collector.on("collect", async (i) => {
     if (i.customId !== "prophecy_reroll") return;
+    if (i.user.id !== message.author.id) return i.reply({ content: "Not your prophecy.", ephemeral: true });
 
     prophecy = generate();
 
@@ -799,6 +800,7 @@ if (command === "prophecy") {
     });
   });
 }
+
 
 
 
@@ -2146,6 +2148,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
