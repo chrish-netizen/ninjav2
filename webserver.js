@@ -45,6 +45,9 @@ export function startWebserver(client) {
       --accent: #444444;
       --border: #ffffff;
     }
+    html, body {
+      height: 100%;
+    }
     body {
       background-color: var(--bg);
       color: var(--fg);
@@ -54,6 +57,7 @@ export function startWebserver(client) {
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       min-height: 100vh;
       -webkit-font-smoothing: antialiased;
     }

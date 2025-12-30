@@ -3,6 +3,7 @@ import { startWebserver } from './webserver.js';
 import {
   connectDB,
   getAfkData, setAfkData, getAllAfkData, deleteAfkData,
+  getAfkActive, setAfkActive, deleteAfkActive, getAllAfkActive,
   getMsgCount, incrementMsgCount, getAllMsgCounts,
   getChatMemory, setChatMemory,
   getUserProfile, setUserProfile,
@@ -214,8 +215,19 @@ async function groqReply(key, input) {
 
 /* ===================== READY ===================== */
 
-client.once('clientReady', () => {
+client.once('clientReady', async () => {
   console.log(`✅ Logged in as ${client.user.tag}`);
+
+  // Load active AFK sessions from database into memory
+  try {
+    const activeAfkSessions = await getAllAfkActive();
+    for (const [userId, session] of activeAfkSessions) {
+      afkActive.set(userId, session);
+    }
+    console.log(`📥 Loaded ${activeAfkSessions.size} active AFK sessions`);
+  } catch (err) {
+    console.error('Failed to load AFK sessions:', err);
+  }
 
   client.user.setPresence({
     activities: [
@@ -446,18 +458,22 @@ function parseDuration(str) {
 async function handleAfkReturn(message) {
   const userId = message.author.id;
 
-  // User is not AFK → skip
-  if (!afkActive.has(userId)) return;
+  // User is not AFK → skip (check both memory cache and database)
+  let data = afkActive.get(userId);
+  if (!data) {
+    data = await getAfkActive(userId);
+    if (!data) return;
+  }
 
-  const data = afkActive.get(userId);
   const duration = Date.now() - data.since;
 
   // Add AFK time to totals in MongoDB
   const prev = await getAfkData(userId) || 0;
   await setAfkData(userId, prev + duration);
 
-  // Remove AFK state
+  // Remove AFK state from both memory and database
   afkActive.delete(userId);
+  await deleteAfkActive(userId);
 
   // Restore nickname ONLY if:
   // - Bot changed it earlier
@@ -509,8 +525,13 @@ client.on('messageCreate', async (message) => {
     // ===================== AFK MENTION CHECK ===================== //
     if (message.mentions.users.size > 0) {
       for (const user of message.mentions.users.values()) {
-        if (afkActive.has(user.id)) {
-          const data = afkActive.get(user.id);
+        // Check memory first, then database
+        let data = afkActive.get(user.id);
+        if (!data) {
+          data = await getAfkActive(user.id);
+        }
+        
+        if (data) {
           const duration = Date.now() - data.since;
 
           const container = new ContainerBuilder()
@@ -1387,7 +1408,8 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
       const now = Date.now();
       const userId = message.author.id;
 
-      if (afkActive.has(userId)) {
+      // Check both memory and database
+      if (afkActive.has(userId) || await getAfkActive(userId)) {
         return message.reply('You are already marked as AFK.').catch(() => { });
       }
 
@@ -1407,12 +1429,16 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
         }
       } catch { }
 
-      afkActive.set(userId, {
+      const afkSession = {
         since: now,
         reason,
         originalNickname,
         hadNicknameChange
-      });
+      };
+
+      // Save to both memory (for fast access) and MongoDB (for persistence)
+      afkActive.set(userId, afkSession);
+      await setAfkActive(userId, afkSession);
 
       const container = new ContainerBuilder()
         .setAccentColor(0x2b2d31)

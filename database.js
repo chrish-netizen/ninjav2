@@ -60,6 +60,8 @@ export async function closeDB() {
 }
 
 
+// ==================== AFK TOTALS (accumulated time) ====================
+
 export async function getAfkData(userId) {
   const doc = await db.collection(COLLECTIONS.afkData).findOne({ oduserId: userId });
   return doc?.data || null;
@@ -80,6 +82,30 @@ export async function deleteAfkData(userId) {
 export async function getAllAfkData() {
   const docs = await db.collection(COLLECTIONS.afkData).find({}).toArray();
   return new Map(docs.map(doc => [doc.oduserId, doc.data]));
+}
+
+// ==================== AFK ACTIVE (currently AFK users) ====================
+
+export async function getAfkActive(userId) {
+  const doc = await db.collection('afkActive').findOne({ oduserId: userId });
+  return doc?.session || null;
+}
+
+export async function setAfkActive(userId, session) {
+  await db.collection('afkActive').updateOne(
+    { oduserId: userId },
+    { $set: { oduserId: userId, session, updatedAt: new Date() } },
+    { upsert: true }
+  );
+}
+
+export async function deleteAfkActive(userId) {
+  await db.collection('afkActive').deleteOne({ oduserId: userId });
+}
+
+export async function getAllAfkActive() {
+  const docs = await db.collection('afkActive').find({}).toArray();
+  return new Map(docs.map(doc => [doc.oduserId, doc.session]));
 }
 
 
