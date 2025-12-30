@@ -315,6 +315,7 @@ const HELP_CATEGORIES = {
       { name: ',bird', desc: 'Random bird image' },
       { name: ',pokemon', desc: 'Rolls a random pokemon' },
       { name: ',ship', desc: 'ship 2 users' },
+      { name: ',prophecy', desc: 'show a users fate' },
       { name: ',fact', desc: 'Useless fact' }
     ]
   },
@@ -2127,6 +2128,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
