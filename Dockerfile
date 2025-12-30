@@ -13,8 +13,16 @@ RUN npm install --production
 # Copy application files
 COPY . .
 
-# Create storage directory for persistent data
-RUN mkdir -p /app/storage
+# Create storage directory and initialize JSON files
+RUN mkdir -p /app/storage && \
+    echo '{}' > /app/storage/afkData.json && \
+    echo '{}' > /app/storage/blacklist.json && \
+    echo '{}' > /app/storage/chatMemory.json && \
+    echo '{}' > /app/storage/commandUsage.json && \
+    echo '{}' > /app/storage/convoSummaries.json && \
+    echo '{}' > /app/storage/memory.json && \
+    echo '{}' > /app/storage/msgData.json && \
+    echo '{}' > /app/storage/userProfiles.json
 
 # Set environment variables
 ENV NODE_ENV=production
