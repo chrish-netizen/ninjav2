@@ -713,7 +713,6 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
 if (command === "predictdeath") {
   const target = message.mentions.users.first() || message.author;
 
-  // Randomized fictional prophecy data
   const causes = [
     "being consumed by a rogue timeline",
     "accidentally opening a forbidden portal",
@@ -766,42 +765,50 @@ if (command === "predictdeath") {
     "once the veil thins"
   ];
 
-  const cause = causes[Math.floor(Math.random() * causes.length)];
-  const location = locations[Math.floor(Math.random() * locations.length)];
-  const warning = warnings[Math.floor(Math.random() * warnings.length)];
-  const date = dates[Math.floor(Math.random() * dates.length)];
+  function generateProphecy() {
+    return {
+      cause: causes[Math.floor(Math.random() * causes.length)],
+      location: locations[Math.floor(Math.random() * locations.length)],
+      warning: warnings[Math.floor(Math.random() * warnings.length)],
+      date: dates[Math.floor(Math.random() * dates.length)]
+    };
+  }
 
-  const container = new ContainerBuilder()
-    .addTextDisplayComponents(
-      new TextDisplayBuilder().setContent(`## 🔮 Prophecy for ${target.username}`)
-    )
-    .addSeparatorComponents(
-      new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true)
-    )
-    .addTextDisplayComponents(
-      new TextDisplayBuilder().setContent(`**Cause:** ${cause}`)
-    )
-    .addTextDisplayComponents(
-      new TextDisplayBuilder().setContent(`**Location:** ${location}`)
-    )
-    .addTextDisplayComponents(
-      new TextDisplayBuilder().setContent(`**Predicted Time:** ${date}`)
-    )
-    .addSeparatorComponents(
-      new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true)
-    )
-    .addTextDisplayComponents(
-      new TextDisplayBuilder().setContent(`**Warning:** ${warning}`)
-    )
-    .addButtonComponents(
-      new ButtonBuilder()
-        .setCustomId("predictdeath_reroll")
-        .setLabel("Reroll Prophecy")
-        .setStyle(ButtonStyle.Secondary)
-    );
+  let prophecy = generateProphecy();
+
+  function buildContainer() {
+    return new ContainerBuilder()
+      .addTextDisplayComponent(
+        new TextDisplayBuilder().setContent(`## 🔮 Prophecy for ${target.username}`)
+      )
+      .addSeparatorComponent(
+        new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true)
+      )
+      .addTextDisplayComponent(
+        new TextDisplayBuilder().setContent(`**Cause:** ${prophecy.cause}`)
+      )
+      .addTextDisplayComponent(
+        new TextDisplayBuilder().setContent(`**Location:** ${prophecy.location}`)
+      )
+      .addTextDisplayComponent(
+        new TextDisplayBuilder().setContent(`**Predicted Time:** ${prophecy.date}`)
+      )
+      .addSeparatorComponent(
+        new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true)
+      )
+      .addTextDisplayComponent(
+        new TextDisplayBuilder().setContent(`**Warning:** ${prophecy.warning}`)
+      )
+      .addButtonComponent(
+        new ButtonBuilder()
+          .setCustomId("predictdeath_reroll")
+          .setLabel("Reroll Prophecy")
+          .setStyle(ButtonStyle.Secondary)
+      );
+  }
 
   const msg = await message.reply({
-    components: [container],
+    components: [buildContainer()],
     flags: MessageFlags.IsComponentsV2 | MessageFlags.IsPersistent
   });
 
@@ -810,42 +817,10 @@ if (command === "predictdeath") {
   collector.on("collect", async (i) => {
     if (i.customId !== "predictdeath_reroll") return;
 
-    const newCause = causes[Math.floor(Math.random() * causes.length)];
-    const newLocation = locations[Math.floor(Math.random() * locations.length)];
-    const newWarning = warnings[Math.floor(Math.random() * warnings.length)];
-    const newDate = dates[Math.floor(Math.random() * dates.length)];
-
-    const newContainer = new ContainerBuilder()
-      .addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(`## 🔮 Prophecy for ${target.username}`)
-      )
-      .addSeparatorComponents(
-        new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true)
-      )
-      .addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(`**Cause:** ${newCause}`)
-      )
-      .addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(`**Location:** ${newLocation}`)
-      )
-      .addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(`**Predicted Time:** ${newDate}`)
-      )
-      .addSeparatorComponents(
-        new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true)
-      )
-      .addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(`**Warning:** ${newWarning}`)
-      )
-      .addButtonComponents(
-        new ButtonBuilder()
-          .setCustomId("predictdeath_reroll")
-          .setLabel("Reroll Prophecy")
-          .setStyle(ButtonStyle.Secondary)
-      );
+    prophecy = generateProphecy();
 
     await i.update({
-      components: [newContainer],
+      components: [buildContainer()],
       flags: MessageFlags.IsComponentsV2 | MessageFlags.IsPersistent
     });
   });
@@ -2197,6 +2172,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
