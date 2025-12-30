@@ -714,7 +714,9 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
     }
 
 const cooldowns = new Map(); // userId → timestamp
-if (command === "pp") {
+
+
+    if (command === "pp") {
   const target = message.mentions.users.first() || message.author;
 
   const quotes = [
@@ -730,32 +732,18 @@ if (command === "pp") {
     "this violates several treaties"
   ];
 
-  const generatePP = () => {
-    const length = Math.floor(Math.random() * 20) + 1; // 1–20
-    const shaft = "=".repeat(length);
-    const pp = `3${shaft}D`;
-
-    const quote = quotes[Math.floor(Math.random() * quotes.length)];
-
-    return `**${pp}** — *${quote}*`;
-  };
-
-  // Random number of measurements (8–20)
-  const count = Math.floor(Math.random() * 13) + 8;
+  const length = Math.floor(Math.random() * 20) + 1; // 1–20
+  const shaft = "=".repeat(length);
+  const pp = `3${shaft}D`;
+  const quote = quotes[Math.floor(Math.random() * quotes.length)];
 
   const container = new ContainerBuilder()
     .setAccentColor(0x2b2d31)
     .addTextDisplayComponents(
-      (text) => text.setContent(`## 🍆 PP Analysis for ${target.username}`)
-    );
-
-  for (let i = 0; i < count; i++) {
-    container.addTextDisplayComponents(
-      (text) => text.setContent(generatePP())
-    );
-  }
-
-  container
+      (text) => text.setContent(`## 🍆 PP Size for ${target.username}`),
+      (text) => text.setContent(`**${pp}**`),
+      (text) => text.setContent(`*${quote}*`)
+    )
     .addSeparatorComponents((sep) => sep.setDivider(true))
     .addTextDisplayComponents(
       (text) => text.setContent("-# PP Measurement System")
@@ -767,6 +755,7 @@ if (command === "pp") {
     allowedMentions: { repliedUser: false }
   }).catch(() => {});
 }
+
 
 if (command === "aura") {
   const target = message.mentions.users.first() || message.author;
@@ -2335,6 +2324,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
