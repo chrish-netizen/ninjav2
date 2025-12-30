@@ -290,7 +290,7 @@ const HELP_CATEGORIES = {
       { name: ',userinfo', desc: 'User details' },
       { name: ',translate', desc: 'Translate a message' },
       { name: ',ownerinfo', desc: 'show the owners info' },
-      { name: ',memberdm' , desc: 'DM any user with the command' }.
+      { name: ',memberdm' , desc: 'DM any user with the command' },
       { name: ',uptime', desc: 'Bot uptime' }
     ]
   },
@@ -2211,6 +2211,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
