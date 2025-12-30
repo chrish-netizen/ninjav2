@@ -710,6 +710,78 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
     }
 
 
+if (command === "spotify") {
+  const user = message.mentions.users.first() || message.author;
+  const member = message.guild.members.cache.get(user.id);
+
+  const activity = member.presence?.activities.find(a => a.name === "Spotify" && a.type === 2);
+
+  if (!activity) {
+    return message.reply({
+      content: `${user.username} is not listening to Spotify right now.`,
+      flags: MessageFlags.IsComponentsV2
+    });
+  }
+
+  const track = activity.details || "Unknown Track";
+  const artist = activity.state || "Unknown Artist";
+  const album = activity.assets?.largeText || "Unknown Album";
+  const albumArt = activity.assets?.largeImageURL();
+
+  const start = activity.timestamps?.start;
+  const end = activity.timestamps?.end;
+
+  const progress = start && end
+    ? Math.floor((Date.now() - start.getTime()) / (end.getTime() - start.getTime()) * 100)
+    : null;
+
+  const container = new ContainerBuilder()
+    .addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(`## 🎵 Spotify — ${user.username}`)
+    )
+    .addSeparatorComponents(
+      new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true)
+    )
+    .addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(`**Track:** ${track}`)
+    )
+    .addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(`**Artist:** ${artist}`)
+    )
+    .addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(`**Album:** ${album}`)
+    );
+
+  if (albumArt) {
+    container.addMediaGalleryComponents(
+      new MediaGalleryBuilder().addItems(
+        new MediaGalleryItemBuilder().setSource(albumArt)
+      )
+    );
+  }
+
+  container.addSeparatorComponents(
+    new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true)
+  );
+
+  if (progress !== null) {
+    container.addTextDisplayComponents(
+      new TextDisplayBuilder().setContent(`**Progress:** ${progress}%`)
+    );
+  }
+
+  container.addButtonComponents(
+    new ButtonBuilder()
+      .setStyle(ButtonStyle.Link)
+      .setLabel("Open in Spotify")
+      .setURL(`https://open.spotify.com/track/${activity.syncId}`)
+  );
+
+  return message.reply({
+    components: [container],
+    flags: MessageFlags.IsComponentsV2 | MessageFlags.IsPersistent
+  });
+}
 
 
 
@@ -2056,6 +2128,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
