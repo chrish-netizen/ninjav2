@@ -61,20 +61,20 @@ export async function closeDB() {
 
 
 export async function getAfkData(userId) {
-  const doc = await db.collection(COLLECTIONS.afkData).findOne({ oduserId: oduserId });
+  const doc = await db.collection(COLLECTIONS.afkData).findOne({ oduserId: userId });
   return doc?.data || null;
 }
 
 export async function setAfkData(userId, data) {
   await db.collection(COLLECTIONS.afkData).updateOne(
-    { oduserId: oduserId },
+    { oduserId: userId },
     { $set: { oduserId: userId, data, updatedAt: new Date() } },
     { upsert: true }
   );
 }
 
 export async function deleteAfkData(userId) {
-  await db.collection(COLLECTIONS.afkData).deleteOne({ oduserId: oduserId });
+  await db.collection(COLLECTIONS.afkData).deleteOne({ oduserId: userId });
 }
 
 export async function getAllAfkData() {
@@ -84,13 +84,13 @@ export async function getAllAfkData() {
 
 
 export async function getMsgCount(userId) {
-  const doc = await db.collection(COLLECTIONS.msgData).findOne({ oduserId: oduserId });
+  const doc = await db.collection(COLLECTIONS.msgData).findOne({ oduserId: userId });
   return doc?.count || 0;
 }
 
 export async function setMsgCount(userId, count) {
   await db.collection(COLLECTIONS.msgData).updateOne(
-    { oduserId: oduserId },
+    { oduserId: userId },
     { $set: { oduserId: userId, count, updatedAt: new Date() } },
     { upsert: true }
   );
@@ -98,8 +98,8 @@ export async function setMsgCount(userId, count) {
 
 export async function incrementMsgCount(userId) {
   const result = await db.collection(COLLECTIONS.msgData).findOneAndUpdate(
-    { oduserId: oduserId },
-    { $inc: { count: 1 }, $set: { updatedAt: new Date() }, $setOnInsert: { oduserId: oduserId } },
+    { oduserId: userId },
+    { $inc: { count: 1 }, $set: { updatedAt: new Date() }, $setOnInsert: { oduserId: userId } },
     { upsert: true, returnDocument: 'after' }
   );
   return result?.count || 1;
@@ -112,13 +112,13 @@ export async function getAllMsgCounts() {
 
 
 export async function getChatMemory(userId) {
-  const doc = await db.collection(COLLECTIONS.chatMemory).findOne({ oduserId: oduserId });
+  const doc = await db.collection(COLLECTIONS.chatMemory).findOne({ oduserId: userId });
   return doc?.memory || { history: [] };
 }
 
 export async function setChatMemory(userId, memory) {
   await db.collection(COLLECTIONS.chatMemory).updateOne(
-    { oduserId: oduserId },
+    { oduserId: userId },
     { $set: { oduserId: userId, memory, updatedAt: new Date() } },
     { upsert: true }
   );
@@ -130,13 +130,13 @@ export async function getAllChatMemory() {
 }
 
 export async function getUserProfile(userId) {
-  const doc = await db.collection(COLLECTIONS.userProfiles).findOne({ oduserId: oduserId });
+  const doc = await db.collection(COLLECTIONS.userProfiles).findOne({ oduserId: userId });
   return doc?.profile || { facts: [], style: 'normal' };
 }
 
 export async function setUserProfile(userId, profile) {
   await db.collection(COLLECTIONS.userProfiles).updateOne(
-    { oduserId: oduserId },
+    { oduserId: userId },
     { $set: { oduserId: userId, profile, updatedAt: new Date() } },
     { upsert: true }
   );
@@ -148,14 +148,14 @@ export async function getAllUserProfiles() {
 }
 
 
-export async function getConvoSummary(oduserId) {
-  const doc = await db.collection(COLLECTIONS.convoSummaries).findOne({ oduserId: oduserId });
+export async function getConvoSummary(userId) {
+  const doc = await db.collection(COLLECTIONS.convoSummaries).findOne({ oduserId: userId });
   return doc?.summary || null;
 }
 
 export async function setConvoSummary(userId, summary) {
   await db.collection(COLLECTIONS.convoSummaries).updateOne(
-    { oduserId: oduserId },
+    { oduserId: userId },
     { $set: { oduserId: userId, summary, updatedAt: new Date() } },
     { upsert: true }
   );
@@ -168,20 +168,20 @@ export async function getAllConvoSummaries() {
 
 
 export async function isBlacklisted(userId) {
-  const doc = await db.collection(COLLECTIONS.blacklist).findOne({ oduserId: oduserId });
+  const doc = await db.collection(COLLECTIONS.blacklist).findOne({ oduserId: userId });
   return doc !== null;
 }
 
 export async function addToBlacklist(userId, reason = 'No reason provided') {
   await db.collection(COLLECTIONS.blacklist).updateOne(
-    { oduserId: oduserId },
+    { oduserId: userId },
     { $set: { oduserId: userId, reason, addedAt: new Date() } },
     { upsert: true }
   );
 }
 
 export async function removeFromBlacklist(userId) {
-  await db.collection(COLLECTIONS.blacklist).deleteOne({ oduserId: oduserId });
+  await db.collection(COLLECTIONS.blacklist).deleteOne({ oduserId: userId });
 }
 
 export async function getAllBlacklist() {
