@@ -714,11 +714,10 @@ if (command === "spotify") {
   const user = message.mentions.users.first() || message.author;
   const member = message.guild.members.cache.get(user.id);
 
-  const activity = member.presence?.activities.find(
+  const activity = member?.presence?.activities.find(
     a => a.name === "Spotify" && a.type === 2
   );
 
-  // --- NOT LISTENING BLOCK (V2 SAFE) ---
   if (!activity) {
     const notListening = new ContainerBuilder()
       .addTextDisplayComponents(
@@ -733,11 +732,11 @@ if (command === "spotify") {
     });
   }
 
-  // --- EXTRACT SPOTIFY DATA ---
   const track = activity.details || "Unknown Track";
   const artist = activity.state || "Unknown Artist";
   const album = activity.assets?.largeText || "Unknown Album";
   const albumArt = activity.assets?.largeImageURL();
+  const trackId = activity.syncId;
 
   const start = activity.timestamps?.start;
   const end = activity.timestamps?.end;
@@ -750,7 +749,6 @@ if (command === "spotify") {
       )
     : null;
 
-  // --- MAIN SPOTIFY CONTAINER ---
   const container = new ContainerBuilder()
     .addTextDisplayComponents(
       new TextDisplayBuilder().setContent(`## 🎵 Spotify — ${user.username}`)
@@ -770,7 +768,6 @@ if (command === "spotify") {
       new TextDisplayBuilder().setContent(`**Album:** ${album}`)
     );
 
-  // --- ALBUM ART ---
   if (albumArt) {
     container.addMediaGalleryComponents(
       new MediaGalleryBuilder().addItems(
@@ -785,22 +782,21 @@ if (command === "spotify") {
       .setDivider(true)
   );
 
-  // --- PROGRESS ---
   if (progress !== null) {
     container.addTextDisplayComponents(
       new TextDisplayBuilder().setContent(`**Progress:** ${progress}%`)
     );
   }
 
-  // --- SPOTIFY LINK BUTTON ---
-  container.addButtonComponents(
-    new ButtonBuilder()
-      .setStyle(ButtonStyle.Link)
-      .setLabel("Open in Spotify")
-      .setURL(`https://open.spotify.com/track/${activity.syncId}`)
-  );
+  if (trackId) {
+    container.addButtonComponents(
+      new ButtonBuilder()
+        .setStyle(ButtonStyle.Link)
+        .setLabel("Open in Spotify")
+        .setURL(`https://open.spotify.com/track/${trackId}`)
+    );
+  }
 
-  // --- SEND FINAL V2 MESSAGE ---
   return message.reply({
     components: [container],
     flags: MessageFlags.IsComponentsV2 | MessageFlags.IsPersistent
@@ -2152,6 +2148,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
