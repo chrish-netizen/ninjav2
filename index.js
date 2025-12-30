@@ -739,8 +739,8 @@ if (command === "wyr") {
   let votesA = 0;
   let votesB = 0;
 
-  const container = () =>
-    new ContainerBuilder()
+  function buildContainer() {
+    return new ContainerBuilder()
       .addTextDisplayComponents(
         new TextDisplayBuilder().setContent("## Would You Rather?")
       )
@@ -756,25 +756,28 @@ if (command === "wyr") {
       .addSeparatorComponents(
         new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true)
       )
-      .addActionRowComponents(
-        new ActionRowBuilder().addComponents(
-          new ButtonBuilder()
-            .setCustomId("wyr_a")
-            .setLabel("Choose A")
-            .setStyle(ButtonStyle.Primary),
-          new ButtonBuilder()
-            .setCustomId("wyr_b")
-            .setLabel("Choose B")
-            .setStyle(ButtonStyle.Danger),
-          new ButtonBuilder()
-            .setCustomId("wyr_reroll")
-            .setLabel("Reroll")
-            .setStyle(ButtonStyle.Secondary)
-        )
+      .addButtonComponents(
+        new ButtonBuilder()
+          .setCustomId("wyr_a")
+          .setLabel("Choose A")
+          .setStyle(ButtonStyle.Primary)
+      )
+      .addButtonComponents(
+        new ButtonBuilder()
+          .setCustomId("wyr_b")
+          .setLabel("Choose B")
+          .setStyle(ButtonStyle.Danger)
+      )
+      .addButtonComponents(
+        new ButtonBuilder()
+          .setCustomId("wyr_reroll")
+          .setLabel("Reroll")
+          .setStyle(ButtonStyle.Secondary)
       );
+  }
 
   const msg = await message.reply({
-    components: [container()],
+    components: [buildContainer()],
     flags: MessageFlags.IsComponentsV2 | MessageFlags.IsPersistent
   });
 
@@ -793,7 +796,7 @@ if (command === "wyr") {
       votesB = 0;
 
       return i.update({
-        components: [container()],
+        components: [buildContainer()],
         flags: MessageFlags.IsComponentsV2 | MessageFlags.IsPersistent
       });
     }
@@ -814,21 +817,23 @@ if (command === "wyr") {
       .addSeparatorComponents(
         new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true)
       )
-      .addActionRowComponents(
-        new ActionRowBuilder().addComponents(
-          new ButtonBuilder()
-            .setCustomId("wyr_a")
-            .setLabel("Choose A")
-            .setStyle(ButtonStyle.Primary),
-          new ButtonBuilder()
-            .setCustomId("wyr_b")
-            .setLabel("Choose B")
-            .setStyle(ButtonStyle.Danger),
-          new ButtonBuilder()
-            .setCustomId("wyr_reroll")
-            .setLabel("Reroll")
-            .setStyle(ButtonStyle.Secondary)
-        )
+      .addButtonComponents(
+        new ButtonBuilder()
+          .setCustomId("wyr_a")
+          .setLabel("Choose A")
+          .setStyle(ButtonStyle.Primary)
+      )
+      .addButtonComponents(
+        new ButtonBuilder()
+          .setCustomId("wyr_b")
+          .setLabel("Choose B")
+          .setStyle(ButtonStyle.Danger)
+      )
+      .addButtonComponents(
+        new ButtonBuilder()
+          .setCustomId("wyr_reroll")
+          .setLabel("Reroll")
+          .setStyle(ButtonStyle.Secondary)
       );
 
     await i.update({
@@ -837,6 +842,7 @@ if (command === "wyr") {
     });
   });
 }
+
 
 
 
@@ -2183,6 +2189,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
