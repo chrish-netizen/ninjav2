@@ -476,30 +476,6 @@
     "history": [
       {
         "role": "user",
-        "content": "yessir"
-      },
-      {
-        "role": "assistant",
-        "content": "Alright."
-      },
-      {
-        "role": "user",
-        "content": "aight"
-      },
-      {
-        "role": "assistant",
-        "content": "Alright."
-      },
-      {
-        "role": "user",
-        "content": "aight"
-      },
-      {
-        "role": "assistant",
-        "content": "Alright."
-      },
-      {
-        "role": "user",
         "content": "aight"
       },
       {
@@ -513,6 +489,30 @@
       {
         "role": "assistant",
         "content": "Alright."
+      },
+      {
+        "role": "user",
+        "content": ""
+      },
+      {
+        "role": "assistant",
+        "content": "What's up"
+      },
+      {
+        "role": "user",
+        "content": "not muchh"
+      },
+      {
+        "role": "assistant",
+        "content": "Just chillin'"
+      },
+      {
+        "role": "user",
+        "content": "yessir girl boss"
+      },
+      {
+        "role": "assistant",
+        "content": "Girl boss mode activated"
       }
     ]
   },
