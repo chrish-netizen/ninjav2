@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import './webserver.js';
 import {
   Client,
   GatewayIntentBits,
