@@ -744,17 +744,21 @@ if (command === "anime") {
       )
       .addMediaGalleryComponents(gallery);
 
-    return message.reply({
+    await message.reply({
       components: [container],
       flags: MessageFlags.IsComponentsV2,
       allowedMentions: { repliedUser: false }
     });
 
+    return; // 🔒 Prevents fallthrough or double reply
+
   } catch (err) {
     console.error("Anime command failed:", err);
-    return message.reply("API error: No anime images available right now.");
+    await message.reply("API error: No anime images available right now.");
+    return; // 🔒 Prevents fallthrough
   }
 }
+
 
 
 
@@ -2341,6 +2345,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
