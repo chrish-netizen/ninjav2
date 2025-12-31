@@ -320,7 +320,6 @@ const HELP_CATEGORIES = {
       { name: ',ship', desc: 'ship 2 users' },
       { name: ',prophecy', desc: 'show a users fate' },
       { name: ',aura', desc: 'show a users aura' },
-      { name: ',anime', desc: 'shows a random anime pic' },
       { name: ',fact', desc: 'Useless fact' },
     ]
   },
@@ -805,86 +804,7 @@ if (command === "servericon") {
 
 
 
-if (command === "anime") {
-  const characters = [
-    { name: "Spike Spiegel", url: "https://upload.wikimedia.org/wikipedia/en/0/01/SpikeSpiegel.jpg" },
-    { name: "Jet Black", url: "https://upload.wikimedia.org/wikipedia/en/1/1f/Jet_Black_Cowboy_Bebop.png" },
-    { name: "Kurapika", url: "https://static.wikia.nocookie.net/hunterxhunter/images/4/4f/Kurapika_2011.png" },
-    { name: "Killua Zoldyck", url: "https://static.wikia.nocookie.net/hunterxhunter/images/9/9d/Killua_2011.png" },
-    { name: "Gon Freecss", url: "https://static.wikia.nocookie.net/hunterxhunter/images/1/19/Gon_2011.png" },
-    { name: "Hisoka", url: "https://static.wikia.nocookie.net/hunterxhunter/images/0/0f/Hisoka_2011.png" },
-    { name: "Levi Ackerman", url: "https://upload.wikimedia.org/wikipedia/en/7/7e/Levi_Ackerman.png" },
-    { name: "Eren Yeager", url: "https://static.wikia.nocookie.net/shingekinokyojin/images/5/5a/Eren_Jaeger_character_image.png" },
-    { name: "Armin Arlert", url: "https://static.wikia.nocookie.net/shingekinokyojin/images/3/3c/Armin_Arlert_character_image.png" },
-    { name: "Gojo Satoru", url: "https://static.wikia.nocookie.net/jujutsu-kaisen/images/2/2c/Satoru_Gojo.png" },
-    { name: "Yuji Itadori", url: "https://static.wikia.nocookie.net/jujutsu-kaisen/images/3/3f/Yuji_Itadori.png" },
-    { name: "Megumi Fushiguro", url: "https://static.wikia.nocookie.net/jujutsu-kaisen/images/2/2f/Megumi_Fushiguro.png" },
-    { name: "Kakashi Hatake", url: "https://upload.wikimedia.org/wikipedia/en/8/88/Kakashi_Hatake.png" },
-    { name: "Naruto Uzumaki", url: "https://upload.wikimedia.org/wikipedia/en/9/97/Naruto_Uzumaki.png" },
-    { name: "Sasuke Uchiha", url: "https://upload.wikimedia.org/wikipedia/en/8/86/Sasuke_Uchiha.png" },
-    { name: "Itachi Uchiha", url: "https://upload.wikimedia.org/wikipedia/en/8/86/ItachiUchiha.png" },
-    { name: "Shoto Todoroki", url: "https://static.wikia.nocookie.net/bokunoheroacademia/images/1/1e/Shoto_Todoroki_Profile.png" },
-    { name: "Izuku Midoriya", url: "https://static.wikia.nocookie.net/bokunoheroacademia/images/4/4a/Izuku_Midoriya_Profile.png" },
-    { name: "Bakugo Katsuki", url: "https://static.wikia.nocookie.net/bokunoheroacademia/images/5/5f/Katsuki_Bakugo_Profile.png" },
-    { name: "Tamaki Suou", url: "https://static.wikia.nocookie.net/ouran/images/3/3e/Tamaki_Suoh.png" },
-    { name: "Kyoya Ootori", url: "https://static.wikia.nocookie.net/ouran/images/2/2f/Kyoya_Ootori.png" },
-    { name: "Yusuke Urameshi", url: "https://static.wikia.nocookie.net/yuyuhakusho/images/7/7d/Yusuke_Urameshi.png" },
-    { name: "Hiei", url: "https://static.wikia.nocookie.net/yuyuhakusho/images/4/4e/Hiei.png" },
-    { name: "Howl", url: "https://upload.wikimedia.org/wikipedia/en/4/4f/Howl.png" },
-    { name: "Edward Elric", url: "https://upload.wikimedia.org/wikipedia/en/8/8e/Edward_Elric.png" },
-    { name: "Alphonse Elric", url: "https://upload.wikimedia.org/wikipedia/en/3/35/Alphonse_Elric.png" },
-    { name: "Roy Mustang", url: "https://upload.wikimedia.org/wikipedia/en/7/7e/Roy_Mustang.png" },
-    { name: "Ling Yao", url: "https://static.wikia.nocookie.net/fma/images/4/4c/Ling_Yao.png" },
-    { name: "Rintarou Okabe", url: "https://upload.wikimedia.org/wikipedia/en/3/3e/Rintarou_Okabe.png" },
-    { name: "Gintoki Sakata", url: "https://upload.wikimedia.org/wikipedia/en/5/5f/Gintoki_Sakata.png" },
-    { name: "Hijikata Toshiro", url: "https://static.wikia.nocookie.net/gintama/images/3/3e/Toshirou_Hijikata.png" },
-    { name: "Lelouch Lamperouge", url: "https://upload.wikimedia.org/wikipedia/en/6/65/Lelouch_Lamperouge.png" },
-    { name: "Suzaku Kururugi", url: "https://static.wikia.nocookie.net/codegeass/images/3/3f/Suzaku_Kururugi.png" },
-    { name: "Light Yagami", url: "https://upload.wikimedia.org/wikipedia/en/6/6f/Light_Yagami.png" },
-    { name: "L Lawliet", url: "https://upload.wikimedia.org/wikipedia/en/6/6b/L_Lawliet.png" },
-    { name: "Ken Kaneki", url: "https://upload.wikimedia.org/wikipedia/en/2/2e/Ken_Kaneki.png" },
-    { name: "Touka's Brother Ayato", url: "https://static.wikia.nocookie.net/tokyoghoul/images/8/8f/Ayato_Kirishima.png" },
-    { name: "Roronoa Zoro", url: "https://upload.wikimedia.org/wikipedia/en/2/2e/Roronoa_Zoro.png" },
-    { name: "Sanji", url: "https://upload.wikimedia.org/wikipedia/en/7/7e/Sanji.png" },
-    { name: "Monkey D. Luffy", url: "https://upload.wikimedia.org/wikipedia/en/5/5c/Monkey_D_Luffy.png" },
-    { name: "Trafalgar Law", url: "https://upload.wikimedia.org/wikipedia/en/2/2e/Trafalgar_Law.png" },
-    { name: "Ichigo Kurosaki", url: "https://upload.wikimedia.org/wikipedia/en/6/6f/Ichigo_Kurosaki.png" },
-    { name: "Renji Abarai", url: "https://upload.wikimedia.org/wikipedia/en/7/7e/Renji_Abarai.png" },
-    { name: "Byakuya Kuchiki", url: "https://upload.wikimedia.org/wikipedia/en/2/2e/Byakuya_Kuchiki.png" },
-    { name: "Toshiro Hitsugaya", url: "https://upload.wikimedia.org/wikipedia/en/6/6f/Toshiro_Hitsugaya.png" },
-    { name: "Meliodas", url: "https://upload.wikimedia.org/wikipedia/en/6/6f/Meliodas.png" },
-    { name: "Ban", url: "https://upload.wikimedia.org/wikipedia/en/2/2e/Ban_Seven_Deadly_Sins.png" },
-    { name: "King", url: "https://upload.wikimedia.org/wikipedia/en/7/7e/King_Seven_Deadly_Sins.png" },
-    { name: "Sinbad", url: "https://upload.wikimedia.org/wikipedia/en/6/6f/Sinbad_Magi.png" },
-    { name: "Alibaba Saluja", url: "https://static.wikia.nocookie.net/magi/images/2/2f/Alibaba_Saluja.png" },
-    { name: "Kazuto Kirigaya", url: "https://upload.wikimedia.org/wikipedia/en/6/6f/Kazuto_Kirigaya.png" },
-    { name: "Saitama", url: "https://upload.wikimedia.org/wikipedia/en/6/6f/Saitama_OPM.png" },
-    { name: "Genos", url: "https://static.wikia.nocookie.net/onepunchman/images/4/4c/Genos.png" },
-    { name: "Mob", url: "https://upload.wikimedia.org/wikipedia/en/7/7e/Mob_Psycho_100.png" },
-    { name: "Reigen Arataka", url: "https://upload.wikimedia.org/wikipedia/en/2/2e/Reigen_Arataka.png" },
-    { name: "Tanjiro Kamado", url: "https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/7/7d/Tanjiro_anime.png" },
-    { name: "Zenitsu Agatsuma", url: "https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/3/3a/Zenitsu_anime.png" },
-    { name: "Inosuke Hashibira", url: "https://static.wikia.nocookie.net/kimetsu-no-yaiba/images/2/2c/Inosuke_anime.png" }
-  ];
 
-  const pick = characters[Math.floor(Math.random() * characters.length)];
-
-  const gallery = new MediaGalleryBuilder()
-    .addItems(new MediaGalleryItemBuilder().setURL(pick.url));
-
-  const container = new ContainerBuilder()
-    .setAccentColor(0x2b2d31)
-    .addTextDisplayComponents(text => text.setContent(`## 📷 ${pick.name}`))
-    .addMediaGalleryComponents(gallery);
-
-  await message.reply({
-    components: [container],
-    flags: MessageFlags.IsComponentsV2,
-    allowedMentions: { repliedUser: false }
-  });
-
-  return;
-}
 
 
 
@@ -2387,6 +2307,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
