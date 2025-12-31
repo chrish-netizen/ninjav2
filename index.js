@@ -312,9 +312,6 @@ const HELP_CATEGORIES = {
       { name: ',roast', desc: 'Roast a user' },
       { name: ',lore', desc: 'Generate chaotic lore' },
       { name: ',av', desc: 'Strawberry spam' },
-      { name: ',cat', desc: 'Random cat image' },
-      { name: ',dog', desc: 'Random dog image' },
-      { name: ',bird', desc: 'Random bird image' },
       { name: ',pokemon', desc: 'Rolls a random pokemon' },
       { name: ',ship', desc: 'ship 2 users' },
       { name: ',prophecy', desc: 'show a users fate' },
@@ -337,21 +334,7 @@ const HELP_CATEGORIES = {
       { name: ',unmute', desc: 'Unmute a user' }
     ]
   },
-  owner: {
-    emoji: '👑', title: 'Owner Commands', commands: [
-      { name: ',blacklist', desc: 'Block user' },
-      { name: ',unblacklist', desc: 'Unblock user' },
-      { name: ',blacklistcheck', desc: 'View blacklist' },
-      { name: ',forceban', desc: 'Ban by ID' },
-      { name: ',forcekick', desc: 'Kick instantly' },
-      { name: ',changemood', desc: 'Set bot mood' },
-      { name: ',setstatus', desc: 'Set bot status' },
-      { name: ',dm', desc: 'dms a user or all guild owners' },
-      { name: ',restart', desc: 'restarts the bot safely' },
-      { name: ',servers', desc: 'View servers + invites' }
-    ]
-  }
-};
+animals: { emoji: "🦊", title: "Animals", commands: [ { name: ",dog", desc: "Random dog image" }, { name: ",cat", desc: "Random cat image" }, { name: ",bird", desc: "Random bird image" }, { name: ",fox", desc: "Random fox image" } ] } };
 
 // Helper: Create help dropdown menu
 const createHelpDropdown = () =>
@@ -2222,7 +2205,7 @@ if (command === "bird") {
                 '**Prefix:** `,`',
                 '',
                 '🛠️ **Utility** • 🕒 **AFK** • 🏆 **Leaderboard**',
-                '🎉 **Fun** • 🛡️ **Moderation** • 👑 **Owner**',
+                '🎉 **Fun** • 🛡️ **Moderation** • 🦊 **Animals**',
                 '',
                 '*Select a category below to view commands*'
               ].join('\n')
@@ -2354,6 +2337,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
