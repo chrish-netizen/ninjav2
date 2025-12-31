@@ -318,7 +318,7 @@ const HELP_CATEGORIES = {
 
   animals: {
     emoji: '🦊',
-    title: 'Animals',
+    title: 'Fun Animals',
     commands: [
       { name: ',cat', desc: 'Sends a random cat image' },
       { name: ',dog', desc: 'Sends a random dog image' },
@@ -2364,6 +2364,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
