@@ -282,7 +282,9 @@ const sendContainer = (message, container) =>
 // Reusable help categories data
 const HELP_CATEGORIES = {
   utility: {
-    emoji: '🛠️', title: 'Utility Commands', commands: [
+    emoji: '🛠️',
+    title: 'Utility Commands',
+    commands: [
       { name: 'serverinfo', desc: 'shows everything about the server' },
       { name: ',ping', desc: 'Check bot latency' },
       { name: ',info', desc: 'Bot info' },
@@ -290,36 +292,45 @@ const HELP_CATEGORIES = {
       { name: ',userinfo', desc: 'User details' },
       { name: ',translate', desc: 'Translate a message' },
       { name: ',ownerinfo', desc: 'show the owners info' },
-      { name: ',memberdm' , desc: 'DM any user with the command' },
-      { name: ',servericon' , desc: 'show the servers icon' },
+      { name: ',memberdm', desc: 'DM any user with the command' },
+      { name: ',servericon', desc: 'show the servers icon' },
       { name: ',uptime', desc: 'Bot uptime' }
     ]
   },
+
   afk: {
-    emoji: '🕒', title: 'AFK Commands', commands: [
+    emoji: '🕒',
+    title: 'AFK Commands',
+    commands: [
       { name: ',afk', desc: 'Set AFK status' },
       { name: ',afklb', desc: 'AFK leaderboard' }
     ]
   },
+
   leaderboard: {
-    emoji: '🏆', title: 'Leaderboard Commands', commands: [
+    emoji: '🏆',
+    title: 'Leaderboard Commands',
+    commands: [
       { name: ',msglb', desc: 'Message leaderboard' },
       { name: ',afklb', desc: 'AFK leaderboard' }
     ]
   },
+
   animals: {
-  emoji: "🦊",
-  title: "Animals",
-  commands: [
-    { name: ",cat", desc: "Sends a random cat image" },
-    { name: ",dog", desc: "Sends a random dog image" },
-    { name: ",bird", desc: "Sends a random bird image" },
-    { name: ",fox", desc: "Sends a random fox image" }
-  ]
-},
+    emoji: '🦊',
+    title: 'Animals',
+    commands: [
+      { name: ',cat', desc: 'Sends a random cat image' },
+      { name: ',dog', desc: 'Sends a random dog image' },
+      { name: ',bird', desc: 'Sends a random bird image' },
+      { name: ',fox', desc: 'Sends a random fox image' }
+    ]
+  },
 
   fun: {
-    emoji: '🎉', title: 'Fun Commands', commands: [
+    emoji: '🎉',
+    title: 'Fun Commands',
+    commands: [
       { name: ',roast', desc: 'Roast a user' },
       { name: ',lore', desc: 'Generate chaotic lore' },
       { name: ',av', desc: 'Strawberry spam' },
@@ -328,11 +339,14 @@ const HELP_CATEGORIES = {
       { name: ',prophecy', desc: 'show a users fate' },
       { name: ',aura', desc: 'show a users aura' },
       { name: ',luck', desc: 'check your luck' },
-      { name: ',fact', desc: 'Useless fact' },
+      { name: ',fact', desc: 'Useless fact' }
     ]
   },
+
   moderation: {
-    emoji: '🛡️', title: 'Moderation Commands', commands: [
+    emoji: '🛡️',
+    title: 'Moderation Commands',
+    commands: [
       { name: ',kick', desc: 'Kick a user' },
       { name: ',ban', desc: 'Ban a user' },
       { name: ',clear', desc: 'Bulk delete messages' },
@@ -344,7 +358,9 @@ const HELP_CATEGORIES = {
       { name: ',unban', desc: 'unban a user' },
       { name: ',unmute', desc: 'Unmute a user' }
     ]
-  },
+  }
+};
+
 
 
 // Helper: Create help dropdown menu
@@ -2348,6 +2364,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
