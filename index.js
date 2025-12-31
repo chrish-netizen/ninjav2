@@ -731,7 +731,7 @@ if (command === "anime") {
   const container = new ContainerBuilder()
     .setAccentColor(0x2b2d31)
     .addTextDisplayComponents(
-      (text) => text.setContent("## 📷 Random Anime Boy")
+      (text) => text.setContent("## 📷 Random Anime Pic")
     )
     .addMediaGalleryComponents(gallery);
 
@@ -2325,6 +2325,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
