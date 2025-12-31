@@ -1422,14 +1422,14 @@ if (command === "dog") {
 
 if (command === "bird") {
   try {
-    const res = await fetch("https://shibe.online/api/birds?count=1");
+    const res = await fetch("https://some-random-api.com/img/birb");
     const data = await res.json();
 
-    if (!data || !data[0]) {
+    if (!data || !data.link) {
       return message.reply("Couldn't fetch a bird right now.");
     }
 
-    const image = data[0];
+    const image = data.link;
 
     const gallery = new MediaGalleryBuilder()
       .addItems(
@@ -1454,6 +1454,7 @@ if (command === "bird") {
     return message.reply("Bird API failed.");
   }
 }
+
 
 
     if (command === 'fact') {
@@ -2353,6 +2354,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
