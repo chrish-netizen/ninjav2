@@ -725,12 +725,12 @@ if (command === "servericon") {
   const container = new ContainerBuilder()
     .setAccentColor(0x2b2d31)
     .addTextDisplayComponents(
-      (text) => text.setContent(`## 🖼️ Server Icon`),
-      (text) => text.setContent(icon || "This server has no icon.")
+      (text) => text.setContent("## 🖼️ Server Icon")
     );
 
   return message.reply({
     components: [container],
+    files: icon ? [icon] : [],
     flags: MessageFlags.IsComponentsV2,
     allowedMentions: { repliedUser: false }
   });
@@ -796,16 +796,17 @@ if (command === "anime") {
   const container = new ContainerBuilder()
     .setAccentColor(0x2b2d31)
     .addTextDisplayComponents(
-      (text) => text.setContent("## 🖼️ Random Anime Image"),
-      (text) => text.setContent(data.url)
+      (text) => text.setContent("## 🖼️ Random Anime Image")
     );
 
   return message.reply({
     components: [container],
+    files: [data.url],
     flags: MessageFlags.IsComponentsV2,
     allowedMentions: { repliedUser: false }
   });
 }
+
 
     
 if (command === "memberdm") {
@@ -2306,6 +2307,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
