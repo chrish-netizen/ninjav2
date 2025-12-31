@@ -309,7 +309,6 @@ const HELP_CATEGORIES = {
   },
   fun: {
     emoji: '🎉', title: 'Fun Commands', commands: [
-      { name: 'pp', desc: 'shows a random pp size' },
       { name: ',roast', desc: 'Roast a user' },
       { name: ',lore', desc: 'Generate chaotic lore' },
       { name: ',av', desc: 'Strawberry spam' },
@@ -320,6 +319,7 @@ const HELP_CATEGORIES = {
       { name: ',ship', desc: 'ship 2 users' },
       { name: ',prophecy', desc: 'show a users fate' },
       { name: ',aura', desc: 'show a users aura' },
+      { name: ',luck', desc: 'check your luck' },
       { name: ',fact', desc: 'Useless fact' },
     ]
   },
@@ -749,62 +749,30 @@ if (command === "servericon") {
 }
 
 
-    if (command === "pp") {
-  const target = message.mentions.users.first() || message.author;
+   
+if (command === "luck") {
+  const luck = Math.floor(Math.random() * 101); // 0–100%
 
-  const length = Math.floor(Math.random() * 20) + 1; // 1–20
-  const shaft = "=".repeat(length);
-  const pp = `3${shaft}D`;
+  let messageText = "";
 
-  // Fixed quote per length
-  const quoteMap = {
-    1: "that’s adorable",
-    2: "wow… that’s a short one",
-    3: "a respectable size",
-    4: "bro calm down",
-    5: "this should be illegal",
-    6: "scientists fear this thing",
-    7: "that’s basically DLC content",
-    8: "this is a war crime",
-    9: "calm down, monster",
-    10: "this violates several treaties",
-    11: "this is a medical anomaly",
-    12: "this broke the scanner",
-    13: "this is a myth",
-    14: "this is a cosmic event",
-    15: "this is a dimensional breach",
-    16: "this is forbidden knowledge",
-    17: "this is a divine artifact",
-    18: "this is a universal constant",
-    19: "this is the final form",
-    20: "this is the end of measurement"
-  };
-
-  const quote = quoteMap[length] || "unmeasurable";
+  if (luck >= 90) messageText = "✨ Incredible luck today!";
+  else if (luck >= 70) messageText = "🍀 You're pretty lucky right now.";
+  else if (luck >= 40) messageText = "🙂 Average luck. Could go either way.";
+  else if (luck >= 20) messageText = "😬 Not looking great...";
+  else messageText = "💀 Your luck is in the bin.";
 
   const container = new ContainerBuilder()
     .setAccentColor(0x2b2d31)
-    .addTextDisplayComponents(
-      (text) => text.setContent(`## 🍆 PP Size for ${target.username}`),
-      (text) => text.setContent(`**${pp}**`),
-      (text) => text.setContent(`*${quote}*`)
-    )
-    .addSeparatorComponents((sep) => sep.setDivider(true))
-    .addTextDisplayComponents(
-      (text) => text.setContent("-# PP Measurement System")
+    .addTextDisplayComponents(text =>
+      text.setContent(`## 🎲 Luck Check\n**${luck}%** — ${messageText}`)
     );
 
   return message.reply({
     components: [container],
     flags: MessageFlags.IsComponentsV2,
     allowedMentions: { repliedUser: false }
-  }).catch(() => {});
+  });
 }
-
-
-
-
-
 
 
 
@@ -2307,6 +2275,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
