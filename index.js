@@ -718,29 +718,40 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
 const cooldowns = new Map(); // userId → timestamp
 
 if (command === "anime") {
-  const res = await fetch("https://nekos.best/api/v2/boy");
-  const data = await res.json();
+  try {
+    const res = await fetch("https://nekos.best/api/v2/boy");
+    const data = await res.json();
 
-  const image = data.results[0].url;
+    if (!data || !data.results || !data.results[0]) {
+      return message.reply("API error: No anime images available right now.");
+    }
 
-  const gallery = new MediaGalleryBuilder()
-    .addItems(
-      new MediaGalleryItemBuilder().setURL(image)
-    );
+    const image = data.results[0].url;
 
-  const container = new ContainerBuilder()
-    .setAccentColor(0x2b2d31)
-    .addTextDisplayComponents(
-      (text) => text.setContent("## 📷 Random Anime Pic")
-    )
-    .addMediaGalleryComponents(gallery);
+    const gallery = new MediaGalleryBuilder()
+      .addItems(
+        new MediaGalleryItemBuilder().setURL(image)
+      );
 
-  return message.reply({
-    components: [container],
-    flags: MessageFlags.IsComponentsV2,
-    allowedMentions: { repliedUser: false }
-  });
+    const container = new ContainerBuilder()
+      .setAccentColor(0x2b2d31)
+      .addTextDisplayComponents(
+        (text) => text.setContent("## 📷 Random Anime Boy")
+      )
+      .addMediaGalleryComponents(gallery);
+
+    return message.reply({
+      components: [container],
+      flags: MessageFlags.IsComponentsV2,
+      allowedMentions: { repliedUser: false }
+    });
+
+  } catch (err) {
+    console.error(err);
+    return message.reply("Failed to load anime image.");
+  }
 }
+
 
 if (command === "servericon") {
   if (!message.guild) return;
@@ -2325,6 +2336,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
