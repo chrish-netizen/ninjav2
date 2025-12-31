@@ -717,27 +717,6 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
 
 const cooldowns = new Map(); // userId → timestamp
 
-if (command === "servericon") {
-  if (!message.guild) return;
-
-  const icon = message.guild.iconURL({ size: 4096 });
-
-  const container = new ContainerBuilder()
-    .setAccentColor(0x2b2d31)
-    .addTextDisplayComponents(
-      (text) => text.setContent("## 📷 Server Icon")
-    );
-
-  return message.reply({
-    components: [container],
-    embeds: icon ? [{
-      image: { url: icon },
-      color: 0x2b2d31
-    }] : [],
-    flags: MessageFlags.IsComponentsV2,
-    allowedMentions: { repliedUser: false }
-  });
-}
 
 
     if (command === "pp") {
@@ -793,26 +772,7 @@ if (command === "servericon") {
 }
 
 
-if (command === "anime") {
-  const res = await fetch("https://api.waifu.pics/sfw/waifu");
-  const data = await res.json();
 
-  const container = new ContainerBuilder()
-    .setAccentColor(0x2b2d31)
-    .addTextDisplayComponents(
-      (text) => text.setContent("## 📷 Random Anime Image")
-    );
-
-  return message.reply({
-    components: [container],
-    embeds: [{
-      image: { url: data.url },
-      color: 0x2b2d31
-    }],
-    flags: MessageFlags.IsComponentsV2,
-    allowedMentions: { repliedUser: false }
-  });
-}
 
 
 
@@ -2315,6 +2275,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
