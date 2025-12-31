@@ -719,14 +719,16 @@ const cooldowns = new Map(); // userId → timestamp
 
 if (command === "anime") {
   try {
-    const res = await fetch("https://nekos.best/api/v2/boy");
+    const res = await fetch("https://api.jikan.moe/v4/characters?page=1&limit=25");
     const data = await res.json();
 
-    if (!data || !data.results || !data.results[0]) {
+    const characters = data.data.filter(c => c.images?.jpg?.image_url);
+    if (!characters.length) {
       return message.reply("API error: No anime images available right now.");
     }
 
-    const image = data.results[0].url;
+    const pick = characters[Math.floor(Math.random() * characters.length)];
+    const image = pick.images.jpg.image_url;
 
     const gallery = new MediaGalleryBuilder()
       .addItems(
@@ -736,7 +738,7 @@ if (command === "anime") {
     const container = new ContainerBuilder()
       .setAccentColor(0x2b2d31)
       .addTextDisplayComponents(
-        (text) => text.setContent("## 📷 Random Anime Boy")
+        (text) => text.setContent(`## 📷 ${pick.name}`)
       )
       .addMediaGalleryComponents(gallery);
 
@@ -751,6 +753,7 @@ if (command === "anime") {
     return message.reply("Failed to load anime image.");
   }
 }
+
 
 
 if (command === "servericon") {
@@ -2336,6 +2339,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
