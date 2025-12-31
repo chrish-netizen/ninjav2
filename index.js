@@ -1349,68 +1349,112 @@ if (command === "prophecy") {
       return message.reply('🍓🍓🍓🍓🍓🍓').catch(() => { });
     }
 
-    if (command === 'cat') {
-      try {
-        const res = await fetch('https://api.thecatapi.com/v1/images/search');
-        const data = await res.json();
-        const img = data[0]?.url;
+ if (command === "cat") {
+  try {
+    const res = await fetch("https://api.thecatapi.com/v1/images/search");
+    const data = await res.json();
 
-        const container = new ContainerBuilder()
-          .setAccentColor(0x2b2d31)
-          .addTextDisplayComponents((text) => text.setContent('**🐱 Random Cat**'))
-          .addMediaGalleryComponents((gallery) =>
-            gallery.addItems((item) => item.setURL(img))
-          )
-          .addSeparatorComponents((sep) => sep.setDivider(true))
-          .addTextDisplayComponents((text) => text.setContent(''));
-
-        return message.reply({ components: [container], flags: MessageFlags.IsComponentsV2, allowedMentions: { repliedUser: false } }).catch(() => { });
-      } catch {
-        return message.reply('Could not fetch a cat right now.').catch(() => { });
-      }
+    if (!data || !data[0] || !data[0].url) {
+      return message.reply("Couldn't fetch a cat right now.");
     }
 
-    if (command === 'dog') {
-      try {
-        const res = await fetch('https://dog.ceo/api/breeds/image/random');
-        const data = await res.json();
-        const img = data.message;
+    const image = data[0].url;
 
-        const container = new ContainerBuilder()
-          .setAccentColor(0x2b2d31)
-          .addTextDisplayComponents((text) => text.setContent('**🐶 Random Dog**'))
-          .addMediaGalleryComponents((gallery) =>
-            gallery.addItems((item) => item.setURL(img))
-          )
-          .addSeparatorComponents((sep) => sep.setDivider(true))
-          .addTextDisplayComponents((text) => text.setContent(''));
+    const gallery = new MediaGalleryBuilder()
+      .addItems(
+        new MediaGalleryItemBuilder().setURL(image)
+      );
 
-        return message.reply({ components: [container], flags: MessageFlags.IsComponentsV2, allowedMentions: { repliedUser: false } }).catch(() => { });
-      } catch {
-        return message.reply('Could not fetch a dog right now.').catch(() => { });
-      }
+    const container = new ContainerBuilder()
+      .setAccentColor(0x2b2d31)
+      .addTextDisplayComponents(text =>
+        text.setContent("## 🐱 Random Cat")
+      )
+      .addMediaGalleryComponents(gallery);
+
+    return message.reply({
+      components: [container],
+      flags: MessageFlags.IsComponentsV2,
+      allowedMentions: { repliedUser: false }
+    });
+
+  } catch (err) {
+    console.error(err);
+    return message.reply("Cat API failed.");
+  }
+}
+
+
+if (command === "dog") {
+  try {
+    const res = await fetch("https://dog.ceo/api/breeds/image/random");
+    const data = await res.json();
+
+    if (!data || !data.message) {
+      return message.reply("Couldn't fetch a dog right now.");
     }
 
-    if (command === 'bird') {
-      try {
-        const res = await fetch('https://some-random-api.com/img/birb');
-        const data = await res.json();
-        const img = data.link;
+    const image = data.message;
 
-        const container = new ContainerBuilder()
-          .setAccentColor(0x2b2d31)
-          .addTextDisplayComponents((text) => text.setContent('**🐦 Random Bird**'))
-          .addMediaGalleryComponents((gallery) =>
-            gallery.addItems((item) => item.setURL(img))
-          )
-          .addSeparatorComponents((sep) => sep.setDivider(true))
-          .addTextDisplayComponents((text) => text.setContent(''));
+    const gallery = new MediaGalleryBuilder()
+      .addItems(
+        new MediaGalleryItemBuilder().setURL(image)
+      );
 
-        return message.reply({ components: [container], flags: MessageFlags.IsComponentsV2, allowedMentions: { repliedUser: false } }).catch(() => { });
-      } catch {
-        return message.reply('Could not fetch a bird right now.').catch(() => { });
-      }
+    const container = new ContainerBuilder()
+      .setAccentColor(0x2b2d31)
+      .addTextDisplayComponents(text =>
+        text.setContent("## 🐶 Random Dog")
+      )
+      .addMediaGalleryComponents(gallery);
+
+    return message.reply({
+      components: [container],
+      flags: MessageFlags.IsComponentsV2,
+      allowedMentions: { repliedUser: false }
+    });
+
+  } catch (err) {
+    console.error(err);
+    return message.reply("Dog API failed.");
+  }
+}
+
+if (command === "bird") {
+  try {
+    const res = await fetch("https://shibe.online/api/birds?count=1");
+    const data = await res.json();
+
+    if (!data || !data[0]) {
+      return message.reply("Couldn't fetch a bird right now.");
     }
+
+    const image = data[0];
+
+    const gallery = new MediaGalleryBuilder()
+      .addItems(
+        new MediaGalleryItemBuilder().setURL(image)
+      );
+
+    const container = new ContainerBuilder()
+      .setAccentColor(0x2b2d31)
+      .addTextDisplayComponents(text =>
+        text.setContent("## 🐦 Random Bird")
+      )
+      .addMediaGalleryComponents(gallery);
+
+    return message.reply({
+      components: [container],
+      flags: MessageFlags.IsComponentsV2,
+      allowedMentions: { repliedUser: false }
+    });
+
+  } catch (err) {
+    console.error(err);
+    return message.reply("Bird API failed.");
+  }
+}
+
 
     if (command === 'fact') {
       try {
@@ -2309,6 +2353,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
