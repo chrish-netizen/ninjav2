@@ -722,10 +722,11 @@ if (command === "anime") {
     const res = await fetch("https://api.jikan.moe/v4/characters?page=1&limit=25");
     const data = await res.json();
 
-    const characters = data.data.filter(c => c.images?.jpg?.image_url);
-    if (!characters.length) {
-      return message.reply("API error: No anime images available right now.");
-    }
+    const characters = Array.isArray(data.data)
+      ? data.data.filter(c => c.images?.jpg?.image_url)
+      : [];
+
+    if (characters.length === 0) throw new Error("No valid characters found");
 
     const pick = characters[Math.floor(Math.random() * characters.length)];
     const image = pick.images.jpg.image_url;
@@ -749,10 +750,11 @@ if (command === "anime") {
     });
 
   } catch (err) {
-    console.error(err);
-    return message.reply("Failed to load anime image.");
+    console.error("Anime command failed:", err);
+    return message.reply("API error: No anime images available right now.");
   }
 }
+
 
 
 
@@ -2339,6 +2341,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
