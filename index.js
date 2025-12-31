@@ -758,6 +758,7 @@ if (command === "anime") {
 
 
 
+
 if (command === "servericon") {
   if (!message.guild) return;
 
@@ -2341,6 +2342,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
