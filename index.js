@@ -307,6 +307,17 @@ const HELP_CATEGORIES = {
       { name: ',afklb', desc: 'AFK leaderboard' }
     ]
   },
+  animals: {
+  emoji: "🦊",
+  title: "Animals",
+  commands: [
+    { name: ",cat", desc: "Sends a random cat image" },
+    { name: ",dog", desc: "Sends a random dog image" },
+    { name: ",bird", desc: "Sends a random bird image" },
+    { name: ",fox", desc: "Sends a random fox image" }
+  ]
+},
+
   fun: {
     emoji: '🎉', title: 'Fun Commands', commands: [
       { name: ',roast', desc: 'Roast a user' },
@@ -334,7 +345,7 @@ const HELP_CATEGORIES = {
       { name: ',unmute', desc: 'Unmute a user' }
     ]
   },
-animals: { emoji: "🦊", title: "Animals", commands: [ { name: ",dog", desc: "Random dog image" }, { name: ",cat", desc: "Random cat image" }, { name: ",bird", desc: "Random bird image" }, { name: ",fox", desc: "Random fox image" } ] } };
+
 
 // Helper: Create help dropdown menu
 const createHelpDropdown = () =>
@@ -2337,6 +2348,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
