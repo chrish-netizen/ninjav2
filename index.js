@@ -2232,7 +2232,7 @@ if (command === "bird") {
                 '**Prefix:** `,`',
                 '',
                 '🛠️ **Utility** • 🕒 **AFK** • 🏆 **Leaderboard**',
-                '🎉 **Fun** • 🛡️ **Moderation** • 🦊 **Animals**',
+                '🎉 **Fun** • 🦊 **Animals** • 🛡️ **Moderation**',
                 '',
                 '*Select a category below to view commands*'
               ].join('\n')
@@ -2364,6 +2364,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
