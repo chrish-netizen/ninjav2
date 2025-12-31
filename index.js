@@ -721,18 +721,20 @@ if (command === "anime") {
   const res = await fetch("https://api.waifu.pics/sfw/waifu");
   const data = await res.json();
 
+  const gallery = new MediaGalleryBuilder()
+    .addItems(
+      new MediaGalleryItemBuilder().setURL(data.url)
+    );
+
   const container = new ContainerBuilder()
     .setAccentColor(0x2b2d31)
     .addTextDisplayComponents(
       (text) => text.setContent("## 📷 Random Anime Image")
-    );
+    )
+    .addMediaGalleryComponents(gallery);
 
   return message.reply({
     components: [container],
-    embeds: [{
-      image: { url: data.url },
-      color: 0x2b2d31
-    }],
     flags: MessageFlags.IsComponentsV2,
     allowedMentions: { repliedUser: false }
   });
@@ -742,18 +744,22 @@ if (command === "servericon") {
 
   const icon = message.guild.iconURL({ size: 4096 });
 
+  const gallery = new MediaGalleryBuilder();
+  if (icon) {
+    gallery.addItems(
+      new MediaGalleryItemBuilder().setURL(icon)
+    );
+  }
+
   const container = new ContainerBuilder()
     .setAccentColor(0x2b2d31)
     .addTextDisplayComponents(
       (text) => text.setContent("## 📷 Server Icon")
-    );
+    )
+    .addMediaGalleryComponents(gallery);
 
   return message.reply({
     components: [container],
-    embeds: icon ? [{
-      image: { url: icon },
-      color: 0x2b2d31
-    }] : [],
     flags: MessageFlags.IsComponentsV2,
     allowedMentions: { repliedUser: false }
   });
@@ -2316,6 +2322,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
