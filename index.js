@@ -718,7 +718,7 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
 const cooldowns = new Map(); // userId → timestamp
 
 if (command === "anime") {
-  const res = await fetch("https://api.waifu.pics/sfw/waifu");
+  const res = await fetch("https://nekos.best/api/v2/boy");
   const data = await res.json();
 
   const gallery = new MediaGalleryBuilder()
@@ -2322,6 +2322,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
