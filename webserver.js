@@ -25,20 +25,90 @@ export function startWebserver(client) {
 
         const memUsage = Math.round(process.memoryUsage().heapUsed / 1024 / 1024);
 
-        // 🔥 AUTO‑LOAD COMMANDS FROM THE BOT
-        let commandList = [];
-        try {
-          if (client.commands) {
-            commandList = [...client.commands.keys()];
-          } else {
-            commandList = ["client.commands not found"];
-          }
-        } catch (err) {
-          console.error("Error loading commands:", err);
-          commandList = ["Error loading commands"];
-        }
+        // ⭐ YOUR COMMAND CATEGORIES
+        const commandCategories = {
+          general: {
+            emoji: "📌",
+            title: "General Commands",
+            commands: [
+              { name: "serverinfo", desc: "shows everything about the server" },
+              { name: ",ping", desc: "Check bot latency" },
+              { name: ",info", desc: "Bot info" },
+              { name: ",avatar", desc: "User avatar" },
+              { name: ",userinfo", desc: "User details" },
+              { name: ",translate", desc: "Translate a message" },
+              { name: ",ownerinfo", desc: "show the owners info" },
+              { name: ",memberdm", desc: "DM any user with the command" },
+              { name: ",servericon", desc: "show the servers icon" },
+              { name: ",uptime", desc: "Bot uptime" }
+            ]
+          },
 
-        // 🔥 FULL HTML PAGE
+          afk: {
+            emoji: "🕒",
+            title: "AFK Commands",
+            commands: [
+              { name: ",afk", desc: "Set AFK status" },
+              { name: ",afklb", desc: "AFK leaderboard" }
+            ]
+          },
+
+          leaderboard: {
+            emoji: "🏆",
+            title: "Leaderboard Commands",
+            commands: [
+              { name: ",msglb", desc: "Message leaderboard" },
+              { name: ",afklb", desc: "AFK leaderboard" }
+            ]
+          },
+
+          animals: {
+            emoji: "🦊",
+            title: "Fun Animals",
+            commands: [
+              { name: ",cat", desc: "Sends a random cat image" },
+              { name: ",dog", desc: "Sends a random dog image" },
+              { name: ",bird", desc: "Sends a random bird image" },
+              { name: ",fox", desc: "Sends a random fox image" }
+            ]
+          },
+
+          fun: {
+            emoji: "🎉",
+            title: "Fun Commands",
+            commands: [
+              { name: ",roast", desc: "Roast a user" },
+              { name: ",lore", desc: "Generate chaotic lore" },
+              { name: ",av", desc: "Strawberry spam" },
+              { name: ",pokemon", desc: "Rolls a random pokemon" },
+              { name: ",ship", desc: "ship 2 users" },
+              { name: ",prophecy", desc: "show a users fate" },
+              { name: ",aura", desc: "show a users aura" },
+              { name: ",luck", desc: "check your luck" },
+              { name: ",fact", desc: "Useless fact" }
+            ]
+          }
+        };
+
+        // ⭐ BUILD CATEGORY HTML
+        const categoryButtons = Object.keys(commandCategories)
+          .map(cat => `<button class="cat-btn" onclick="showCategory('${cat}')">${commandCategories[cat].emoji}</button>`)
+          .join('');
+
+        const categorySections = Object.keys(commandCategories)
+          .map(cat => `
+            <div class="command-category" id="${cat}" style="display:none;">
+              <h3>${commandCategories[cat].emoji} ${commandCategories[cat].title}</h3>
+              <ul>
+                ${commandCategories[cat].commands
+                  .map(cmd => `<li><strong>${cmd.name}</strong> — ${cmd.desc}</li>`)
+                  .join('')}
+              </ul>
+            </div>
+          `)
+          .join('');
+
+        // ⭐ FULL HTML PAGE
         const html = `
 <!DOCTYPE html>
 <html lang="en">
@@ -114,7 +184,7 @@ export function startWebserver(client) {
       text-align: center;
     }
 
-    /* COMMANDS SECTION */
+    /* COMMANDS */
     .commands {
       margin-top: 25px;
       border-top: 1px solid var(--border);
@@ -126,16 +196,25 @@ export function startWebserver(client) {
       text-transform: uppercase;
       letter-spacing: 1px;
     }
-    .commands ul {
+    .cat-btn {
+      background: #111;
+      color: white;
+      border: 1px solid white;
+      padding: 5px 10px;
+      margin-right: 5px;
+      cursor: pointer;
+    }
+    .cat-btn:hover {
+      background: #333;
+    }
+    .command-category ul {
       list-style: none;
       padding: 0;
-      margin: 0;
-      columns: 2;
+      margin: 10px 0 0 0;
     }
-    .commands li {
-      font-size: 0.85rem;
+    .command-category li {
       padding: 3px 0;
-      opacity: 0.85;
+      font-size: 0.85rem;
     }
   </style>
 </head>
@@ -159,18 +238,26 @@ export function startWebserver(client) {
       <div class="card"><h2>Blacklisted</h2><div class="value">${blacklistCount}</div></div>
     </div>
 
-    <!-- COMMAND LIST -->
+    <!-- ⭐ CATEGORY SWITCHER -->
     <div class="commands">
-      <h2>Available Commands</h2>
-      <ul>
-        ${commandList.map(cmd => `<li>${cmd}</li>`).join('')}
-      </ul>
+      <h2>Commands</h2>
+      <div>${categoryButtons}</div>
+      ${categorySections}
     </div>
 
     <div class="footer">
       SYSTEM TIME: ${new Date().toISOString()}
     </div>
   </div>
+
+  <script>
+    function showCategory(cat) {
+      document.querySelectorAll('.command-category').forEach(div => div.style.display = 'none');
+      document.getElementById(cat).style.display = 'block';
+    }
+    showCategory('general');
+  </script>
+
 </body>
 </html>
         `;
@@ -204,4 +291,4 @@ function formatUptime(ms) {
   const hours = Math.floor((ms / 1000 / 60 / 60) % 24);
   const days = Math.floor(ms / 1000 / 60 / 60 / 24);
   return `${days}d ${hours}h ${minutes}m`;
-}
+        }
