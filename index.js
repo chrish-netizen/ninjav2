@@ -229,17 +229,26 @@ client.once('clientReady', async () => {
     console.error('Failed to load AFK sessions:', err);
   }
 
+  // ⭐ Presence setup
   client.user.setPresence({
     activities: [
       {
-        name: "Ninja V2 Dashboard",
-        type: ActivityType.Streaming,
-        url: "https://ninjav2info.koyeb.app/"
+        // This shows inside the bot's profile (clickable)
+        name: "https://ninjav2info.koyeb.app/",
+        type: ActivityType.Playing
       }
     ],
-    status: "idle"
+
+    // This shows in the member list
+    status: "online"
+  });
+
+  // ⭐ Custom status text (the one visible in the member list)
+  client.user.setActivity(",help or ,info for command list", {
+    type: ActivityType.Custom
   });
 });
+
 
 
 /* ===================== HELPERS ===================== */
@@ -2419,6 +2428,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
