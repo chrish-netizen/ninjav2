@@ -726,7 +726,35 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
 
 const cooldowns = new Map(); // userId → timestamp
 
+if (command === "info") {
 
+  const servers = client.guilds.cache.size;
+  const users = client.guilds.cache.reduce((a, g) => a + g.memberCount, 0);
+
+  const container = new ContainerBuilder()
+    .setAccentColor(0x2b2d31)
+    .addTextDisplayComponents(text =>
+      text.setContent(
+`## 🧩 Ninja V2 — Bot Information
+
+**Status:** Online
+**Servers:** ${servers}
+**Users:** ${users}
+
+### 🌐 Dashboard
+https://ninjav2info.koyeb.app/
+
+Thank you for using Ninja V2.`
+      )
+    );
+
+  return message.reply({
+    components: [container],
+    flags: MessageFlags.IsComponentsV2,
+    allowedMentions: { repliedUser: false }
+  });
+}
+    
 
 if (command === "fox") {
   try {
@@ -2389,6 +2417,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
