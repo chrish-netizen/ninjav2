@@ -232,13 +232,15 @@ client.once('clientReady', async () => {
   client.user.setPresence({
     activities: [
       {
-        name: 'Ninja V2 Commands | ,help',
-        type: ActivityType.Playing
+        name: "Ninja V2 Dashboard",
+        type: ActivityType.Streaming,
+        url: "https://ninjav2info.koyeb.app/"
       }
     ],
-    status: 'idle'
+    status: "idle"
   });
 });
+
 
 /* ===================== HELPERS ===================== */
 
@@ -2417,6 +2419,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
