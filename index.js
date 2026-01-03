@@ -929,7 +929,7 @@ if (command === "memberdm") {
   }).catch(() => {});
 }
 
-export default {
+module.exports = {
   name: "info",
   description: "Shows bot information",
 
@@ -2417,6 +2417,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
