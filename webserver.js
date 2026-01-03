@@ -1,5 +1,6 @@
 import http from 'http';
 import os from 'os';
+import fs from 'fs';
 import { getAllAfkData, getAllMsgCounts, getAllBlacklist } from './database.js';
 
 export function startWebserver(client) {
@@ -26,6 +27,15 @@ export function startWebserver(client) {
         
         // System stats
         const memUsage = Math.round(process.memoryUsage().heapUsed / 1024 / 1024);
+
+        // Load commands from JSON (auto-updates when Git updates)
+        let commands = [];
+        try {
+          const data = fs.readFileSync('./commands.json', 'utf8');
+          commands = JSON.parse(data).commands || [];
+        } catch (err) {
+          console.error("Failed to load commands.json:", err);
+        }
 
         const html = `
 <!DOCTYPE html>
@@ -120,6 +130,30 @@ export function startWebserver(client) {
       50% { opacity: 0; }
       100% { opacity: 1; }
     }
+
+    /* Commands Section */
+    .commands {
+      margin-top: 25px;
+      border-top: 1px solid var(--border);
+      padding-top: 15px;
+    }
+    .commands h2 {
+      font-size: 1rem;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .commands ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .commands li {
+      font-size: 0.85rem;
+      padding: 3px 0;
+      opacity: 0.8;
+    }
+
     /* Tablet */
     @media (max-width: 768px) {
       h1 {
@@ -173,42 +207,22 @@ export function startWebserver(client) {
     </header>
 
     <div class="status-grid">
-      <div class="card">
-        <h2>Uptime</h2>
-        <div class="value">${uptime}</div>
-      </div>
-      <div class="card">
-        <h2>Ping</h2>
-        <div class="value">${ping} ms</div>
-      </div>
-      <div class="card">
-        <h2>Memory</h2>
-        <div class="value">${memUsage} MB</div>
-      </div>
-      <div class="card">
-        <h2>Servers</h2>
-        <div class="value">${guilds}</div>
-      </div>
-      <div class="card">
-        <h2>Users</h2>
-        <div class="value">${members}</div>
-      </div>
-      <div class="card">
-        <h2>Channels</h2>
-        <div class="value">${channels}</div>
-      </div>
-      <div class="card">
-        <h2>AFK Users</h2>
-        <div class="value">${afkCount}</div>
-      </div>
-      <div class="card">
-        <h2>Msg Trackers</h2>
-        <div class="value">${msgCount}</div>
-      </div>
-      <div class="card">
-        <h2>Blacklisted</h2>
-        <div class="value">${blacklistCount}</div>
-      </div>
+      <div class="card"><h2>Uptime</h2><div class="value">${uptime}</div></div>
+      <div class="card"><h2>Ping</h2><div class="value">${ping} ms</div></div>
+      <div class="card"><h2>Memory</h2><div class="value">${memUsage} MB</div></div>
+      <div class="card"><h2>Servers</h2><div class="value">${guilds}</div></div>
+      <div class="card"><h2>Users</h2><div class="value">${members}</div></div>
+      <div class="card"><h2>Channels</h2><div class="value">${channels}</div></div>
+      <div class="card"><h2>AFK Users</h2><div class="value">${afkCount}</div></div>
+      <div class="card"><h2>Msg Trackers</h2><div class="value">${msgCount}</div></div>
+      <div class="card"><h2>Blacklisted</h2><div class="value">${blacklistCount}</div></div>
+    </div>
+
+    <div class="commands">
+      <h2>Available Commands</h2>
+      <ul>
+        ${commands.map(cmd => `<li>${cmd}</li>`).join('')}
+      </ul>
     </div>
 
     <div class="footer">
@@ -246,4 +260,4 @@ function formatUptime(ms) {
   const hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
   const days = Math.floor(ms / (1000 * 60 * 60 * 24));
   return `${days}d ${hours}h ${minutes}m`;
-}
+        }
