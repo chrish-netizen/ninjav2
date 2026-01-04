@@ -1070,20 +1070,7 @@ Thank you for using Ninja V2.`
 
 
 
-
-
-    if (command === "setfm") {
-      const username = args[0];
-      if (!username) return message.reply("You must provide a Last.fm username.");
-
-      await setFMUser(message.author.id, username);
-
-      return message.reply(`Your Last.fm username has been set to **${username}**`);
-    }
-
-
-
-   if (command === "fm") {
+if (command === "fm") {
   const username = args[0] || (await getFMUser(message.author.id));
 
   if (!username)
@@ -1118,12 +1105,27 @@ Thank you for using Ninja V2.`
       footer: { text: `Last.fm • ${username}` }
     };
 
-import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  ComponentType
-} from "discord.js";
+    return message.reply({ embeds: [embed] });
+
+  } catch (err) {
+    console.error(err);
+    return message.reply("Error fetching Last.fm data.");
+  }
+      }
+    
+
+    if (command === "setfm") {
+      const username = args[0];
+      if (!username) return message.reply("You must provide a Last.fm username.");
+
+      await setFMUser(message.author.id, username);
+
+      return message.reply(`Your Last.fm username has been set to **${username}**`);
+    }
+
+
+
+   
 
 if (command === "fmlb") {
   const input = args.join(" ");
@@ -2659,6 +2661,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
