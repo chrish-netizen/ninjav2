@@ -1125,8 +1125,7 @@ if (command === "fm") {
 
 
 
-   
-if (command === "fmlb") {
+   if (command === "fmlb") {
   const input = args.join(" ");
 
   const requester = await getFMUser(message.author.id);
@@ -1224,6 +1223,7 @@ if (command === "fmlb") {
     };
   }
 
+  // V2-style components (raw JSON)
   const row = {
     type: 1,
     components: [
@@ -1271,12 +1271,7 @@ if (command === "fmlb") {
     row.components.forEach(btn => btn.disabled = true);
     msg.edit({ components: [row] }).catch(() => {});
   });
-}
-
-
-    
-                                
-
+      }
     
 
     if (command === "pokemon") {
@@ -2667,6 +2662,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
