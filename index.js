@@ -1118,14 +1118,13 @@ Thank you for using Ninja V2.`
       footer: { text: `Last.fm • ${username}` }
     };
 
-    return message.reply({ embeds: [embed] });
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ComponentType
+} from "discord.js";
 
-  } catch (err) {
-    console.error(err);
-    return message.reply("Error fetching Last.fm data.");
-  }
-    }
-    
 if (command === "fmlb") {
   const input = args.join(" ");
 
@@ -1148,13 +1147,11 @@ if (command === "fmlb") {
     artist = t.artist["#text"];
     track = t.name;
   } else {
-    // User provided input
     if (input.includes("-")) {
       const parts = input.split("-");
       artist = parts[0].trim();
       track = parts[1].trim();
     } else {
-      // Only track name → detect artist from user's recent tracks
       const searchUrl = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${requester}&api_key=${process.env.LASTFM_API_KEY}&format=json&limit=50`;
       const searchRes = await fetch(searchUrl);
       const searchData = await searchRes.json();
@@ -1171,7 +1168,7 @@ if (command === "fmlb") {
     }
   }
 
-  // 🔥 NEW: Build user list from server members, NOT database
+  // Build user list from server members
   const guildMembers = await message.guild.members.fetch();
   const fmUsers = [];
 
@@ -1204,20 +1201,73 @@ if (command === "fmlb") {
   const results = await Promise.all(fmUsers.map(u => getTrackScrobbles(u)));
   const sorted = results.sort((a, b) => b.plays - a.plays);
 
-  const lines = sorted
-    .map((u, i) => `**${i + 1}.** ${u.username} — **${u.plays}** plays`)
-    .join("\n");
+  // Pagination setup
+  const pageSize = 5;
+  let page = 0;
+  const totalPages = Math.ceil(sorted.length / pageSize);
 
-  const embed = {
-    color: 0x808080,
-    title: `🎵 Track Leaderboard`,
-    description: `**${artist} — ${track}**\n\n${lines}`,
-    footer: { text: "Last.fm Track Leaderboard" }
-  };
+  function getPageEmbed(pageIndex) {
+    const start = pageIndex * pageSize;
+    const end = start + pageSize;
+    const slice = sorted.slice(start, end);
 
-  return message.reply({ embeds: [embed] });
-}
-    
+    const lines = slice
+      .map((u, i) => `**${start + i + 1}.** ${u.username} — **${u.plays}** plays`)
+      .join("\n");
+
+    return {
+      color: 0x808080,
+      title: `🎵 Track Leaderboard`,
+      description: `**${artist} — ${track}**\n\n${lines}`,
+      footer: { text: `Page ${pageIndex + 1} of ${totalPages}` }
+    };
+  }
+
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId("prev")
+      .setLabel("Previous")
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(true),
+    new ButtonBuilder()
+      .setCustomId("next")
+      .setLabel("Next")
+      .setStyle(ButtonStyle.Secondary)
+      .setDisabled(totalPages <= 1)
+  );
+
+  const msg = await message.reply({
+    embeds: [getPageEmbed(page)],
+    components: [row]
+  });
+
+  const collector = msg.createMessageComponentCollector({
+    componentType: ComponentType.Button,
+    time: 60_000
+  });
+
+  collector.on("collect", async interaction => {
+    if (interaction.user.id !== message.author.id)
+      return interaction.reply({ content: "This isn't your leaderboard.", ephemeral: true });
+
+    if (interaction.customId === "next") page++;
+    if (interaction.customId === "prev") page--;
+
+    row.components[0].setDisabled(page === 0);
+    row.components[1].setDisabled(page === totalPages - 1);
+
+    await interaction.update({
+      embeds: [getPageEmbed(page)],
+      components: [row]
+    });
+  });
+
+  collector.on("end", () => {
+    row.components.forEach(btn => btn.setDisabled(true));
+    msg.edit({ components: [row] }).catch(() => {});
+  });
+        }
+                                
 
     
 
@@ -2609,6 +2659,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
