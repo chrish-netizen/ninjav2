@@ -164,7 +164,7 @@ Behavior rules:
 - answer all questions the user asks
 - try to be funny 
 - when asked how do i contact your owner respond with my owners user name is: seyluns there you can contact him.
-
+- when asked whats your support site respond with my support site is here! https://ninjav2info.koyeb.app/
 - never have . at the end of sentances 
 Context:
 - Current mood: ${currentMood}
@@ -2432,6 +2432,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
