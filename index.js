@@ -1066,8 +1066,60 @@ if (command === "prophecy") {
 
 
 
+if (command === "setfm") {
+  const user = args[0];
+  if (!user) return message.reply("You need to provide a Last.fm username.");
 
+  await client.db.set(`lastfm_${message.author.id}`, user);
 
+  return message.reply(`Your Last.fm username has been set to **${user}**`);
+}
+    
+if (command === "fm") {
+  const username =
+    args[0] ||
+    (await client.db.get(`lastfm_${message.author.id}`));
+
+  if (!username)
+    return message.reply("You need to set your Last.fm username using `,setfm <username>`");
+
+  try {
+    const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${process.env.LASTFM_API_KEY}&format=json&limit=1`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (!data.recenttracks?.track?.length)
+      return message.reply("No tracks found for that user.");
+
+    const track = data.recenttracks.track[0];
+
+    const nowPlaying = track["@attr"]?.nowplaying === "true";
+
+    const artist = track.artist["#text"];
+    const song = track.name;
+    const album = track.album["#text"];
+    const cover = track.image?.[3]["#text"] || null;
+
+    const embed = {
+      color: 0xffffff,
+      title: nowPlaying ? "🎧 Now Playing" : "🎵 Last Played",
+      description: `**${song}**\nby **${artist}**\nAlbum: *${album || "Unknown"}*`,
+      thumbnail: cover ? { url: cover } : null,
+      footer: {
+        text: `Last.fm • ${username}`
+      }
+    };
+
+    return message.reply({ embeds: [embed] });
+
+  } catch (err) {
+    console.error(err);
+    return message.reply("Error fetching Last.fm data.");
+  }
+}
+
+    
 
     if (command === "pokemon") {
       try {
@@ -2457,6 +2509,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
