@@ -9,7 +9,8 @@ import {
   getUserProfile, setUserProfile,
   getConvoSummary, setConvoSummary,
   isBlacklisted, addToBlacklist, removeFromBlacklist, getAllBlacklist,
-  getCommandUsage, incrementCommandUsage
+  getCommandUsage, incrementCommandUsage,
+  getFMUser, setFMUser
 } from './database.js';
 import {
   Client,
@@ -536,7 +537,7 @@ client.on('messageCreate', async (message) => {
         if (!data) {
           data = await getAfkActive(user.id);
         }
-        
+
         if (data) {
           const duration = Date.now() - data.since;
 
@@ -735,18 +736,18 @@ I’m Seylun the developer of this bot i love food and sleep i also love playing
       }).catch(() => { });
     }
 
-const cooldowns = new Map(); // userId → timestamp
+    const cooldowns = new Map(); // userId → timestamp
 
-if (command === "info") {
+    if (command === "info") {
 
-  const servers = client.guilds.cache.size;
-  const users = client.guilds.cache.reduce((a, g) => a + g.memberCount, 0);
+      const servers = client.guilds.cache.size;
+      const users = client.guilds.cache.reduce((a, g) => a + g.memberCount, 0);
 
-  const container = new ContainerBuilder()
-    .setAccentColor(0x2b2d31)
-    .addTextDisplayComponents(text =>
-      text.setContent(
-`## 🧩 Ninja V2 — Bot Information
+      const container = new ContainerBuilder()
+        .setAccentColor(0x2b2d31)
+        .addTextDisplayComponents(text =>
+          text.setContent(
+            `## 🧩 Ninja V2 — Bot Information
 
 **Status:** Online
 **Servers:** ${servers}
@@ -756,124 +757,177 @@ if (command === "info") {
 https://ninjav2info.koyeb.app/
 
 Thank you for using Ninja V2.`
-      )
-    );
+          )
+        );
 
-  return message.reply({
-    components: [container],
-    flags: MessageFlags.IsComponentsV2,
-    allowedMentions: { repliedUser: false }
-  });
-}
-    
-
-if (command === "fox") {
-  try {
-    const res = await fetch("https://randomfox.ca/floof/");
-    const data = await res.json();
-
-    if (!data || !data.image) {
-      return message.reply("Couldn't fetch a fox right now.");
+      return message.reply({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        allowedMentions: { repliedUser: false }
+      });
     }
 
-    const image = data.image;
 
-    const gallery = new MediaGalleryBuilder()
-      .addItems(
-        new MediaGalleryItemBuilder().setURL(image)
-      );
+    if (command === "fox") {
+      try {
+        const res = await fetch("https://randomfox.ca/floof/");
+        const data = await res.json();
 
-    const container = new ContainerBuilder()
-      .setAccentColor(0xffa500)
-      .addTextDisplayComponents(text =>
-        text.setContent("## 🦊 Random Fox")
-      )
-      .addMediaGalleryComponents(gallery);
+        if (!data || !data.image) {
+          return message.reply("Couldn't fetch a fox right now.");
+        }
 
-    return message.reply({
-      components: [container],
-      flags: MessageFlags.IsComponentsV2,
-      allowedMentions: { repliedUser: false }
-    });
+        const image = data.image;
 
-  } catch (err) {
-    console.error(err);
-    return message.reply("Fox API failed.");
-  }
-}
+        const gallery = new MediaGalleryBuilder()
+          .addItems(
+            new MediaGalleryItemBuilder().setURL(image)
+          );
 
+        const container = new ContainerBuilder()
+          .setAccentColor(0xffa500)
+          .addTextDisplayComponents(text =>
+            text.setContent("## 🦊 Random Fox")
+          )
+          .addMediaGalleryComponents(gallery);
 
+        return message.reply({
+          components: [container],
+          flags: MessageFlags.IsComponentsV2,
+          allowedMentions: { repliedUser: false }
+        });
 
-
-if (command === "servericon") {
-  if (!message.guild) return;
-
-  const icon = message.guild.iconURL({ size: 4096 });
-
-  const gallery = new MediaGalleryBuilder();
-  if (icon) {
-    gallery.addItems(
-      new MediaGalleryItemBuilder().setURL(icon)
-    );
-  }
-
-  const container = new ContainerBuilder()
-    .setAccentColor(0x2b2d31)
-    .addTextDisplayComponents(
-      (text) => text.setContent("## 📷 Server Icon")
-    )
-    .addMediaGalleryComponents(gallery);
-
-  return message.reply({
-    components: [container],
-    flags: MessageFlags.IsComponentsV2,
-    allowedMentions: { repliedUser: false }
-  });
-}
-
-
-   
-if (command === "luck") {
-  const luck = Math.floor(Math.random() * 101); // 0–100%
-
-  let messageText = "";
-
-  if (luck >= 90) messageText = "✨ Incredible luck today!";
-  else if (luck >= 70) messageText = "🍀 You're pretty lucky right now.";
-  else if (luck >= 40) messageText = "🙂 Average luck. Could go either way.";
-  else if (luck >= 20) messageText = "😬 Not looking great...";
-  else messageText = "💀 Your luck is in the bin.";
-
-  const container = new ContainerBuilder()
-    .setAccentColor(0x2b2d31)
-    .addTextDisplayComponents(text =>
-      text.setContent(`## 🍀 Luck Check\n**${luck}%** — ${messageText}`)
-    );
-
-  return message.reply({
-    components: [container],
-    flags: MessageFlags.IsComponentsV2,
-    allowedMentions: { repliedUser: false }
-  });
-}
+      } catch (err) {
+        console.error(err);
+        return message.reply("Fox API failed.");
+      }
+    }
 
 
 
-    
-if (command === "memberdm") {
-  const senderId = message.author.id;
-  const now = Date.now();
 
-  if (cooldowns.has(senderId)) {
-    const lastUsed = cooldowns.get(senderId);
-    const diff = (now - lastUsed) / 1000;
+    if (command === "servericon") {
+      if (!message.guild) return;
 
-    if (diff < 20) {
+      const icon = message.guild.iconURL({ size: 4096 });
+
+      const gallery = new MediaGalleryBuilder();
+      if (icon) {
+        gallery.addItems(
+          new MediaGalleryItemBuilder().setURL(icon)
+        );
+      }
+
       const container = new ContainerBuilder()
         .setAccentColor(0x2b2d31)
         .addTextDisplayComponents(
-          (text) => text.setContent(`## ⏳ Cooldown Active`),
-          (text) => text.setContent(`Please wait **${Math.ceil(20 - diff)} seconds** before using this command again.`)
+          (text) => text.setContent("## 📷 Server Icon")
+        )
+        .addMediaGalleryComponents(gallery);
+
+      return message.reply({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        allowedMentions: { repliedUser: false }
+      });
+    }
+
+
+
+    if (command === "luck") {
+      const luck = Math.floor(Math.random() * 101); // 0–100%
+
+      let messageText = "";
+
+      if (luck >= 90) messageText = "✨ Incredible luck today!";
+      else if (luck >= 70) messageText = "🍀 You're pretty lucky right now.";
+      else if (luck >= 40) messageText = "🙂 Average luck. Could go either way.";
+      else if (luck >= 20) messageText = "😬 Not looking great...";
+      else messageText = "💀 Your luck is in the bin.";
+
+      const container = new ContainerBuilder()
+        .setAccentColor(0x2b2d31)
+        .addTextDisplayComponents(text =>
+          text.setContent(`## 🍀 Luck Check\n**${luck}%** — ${messageText}`)
+        );
+
+      return message.reply({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        allowedMentions: { repliedUser: false }
+      });
+    }
+
+
+
+
+    if (command === "memberdm") {
+      const senderId = message.author.id;
+      const now = Date.now();
+
+      if (cooldowns.has(senderId)) {
+        const lastUsed = cooldowns.get(senderId);
+        const diff = (now - lastUsed) / 1000;
+
+        if (diff < 20) {
+          const container = new ContainerBuilder()
+            .setAccentColor(0x2b2d31)
+            .addTextDisplayComponents(
+              (text) => text.setContent(`## ⏳ Cooldown Active`),
+              (text) => text.setContent(`Please wait **${Math.ceil(20 - diff)} seconds** before using this command again.`)
+            )
+            .addSeparatorComponents((sep) => sep.setDivider(true))
+            .addTextDisplayComponents(
+              (text) => text.setContent("-# Member DM System")
+            );
+
+          return message.reply({
+            components: [container],
+            flags: MessageFlags.IsComponentsV2,
+            allowedMentions: { repliedUser: false }
+          }).catch(() => { });
+        }
+      }
+
+      const args = message.content.split(" ").slice(1);
+      const targetId = args[0]?.replace(/[<@!>]/g, "");
+      const dmContent = args.slice(1).join(" ");
+
+      if (!targetId || !dmContent) {
+        const container = new ContainerBuilder()
+          .setAccentColor(0x2b2d31)
+          .addTextDisplayComponents(
+            (text) => text.setContent(`## 📩 Usage Error`),
+            (text) => text.setContent(`Use: \`,memberdm @user your message here\``)
+          )
+          .addSeparatorComponents((sep) => sep.setDivider(true))
+          .addTextDisplayComponents(
+            (text) => text.setContent("-# Member DM System")
+          );
+
+        return message.reply({
+          components: [container],
+          flags: MessageFlags.IsComponentsV2,
+          allowedMentions: { repliedUser: false }
+        }).catch(() => { });
+      }
+
+      const target = await message.client.users.fetch(targetId).catch(() => null);
+      if (!target) {
+        return message.reply("Could not find that user.").catch(() => { });
+      }
+
+      await target.send(`📬 Message from ${message.author.tag}:\n\n${dmContent}`).catch(() => {
+        return message.reply("Failed to send DM.").catch(() => { });
+      });
+
+      cooldowns.set(senderId, now);
+
+      const container = new ContainerBuilder()
+        .setAccentColor(0x2b2d31)
+        .addTextDisplayComponents(
+          (text) => text.setContent(`## ✅ DM Sent`),
+          (text) => text.setContent(`Your message was sent to **${target.username}**.`)
         )
         .addSeparatorComponents((sep) => sep.setDivider(true))
         .addTextDisplayComponents(
@@ -884,72 +938,19 @@ if (command === "memberdm") {
         components: [container],
         flags: MessageFlags.IsComponentsV2,
         allowedMentions: { repliedUser: false }
-      }).catch(() => {});
+      }).catch(() => { });
     }
-  }
 
-  const args = message.content.split(" ").slice(1);
-  const targetId = args[0]?.replace(/[<@!>]/g, "");
-  const dmContent = args.slice(1).join(" ");
+    if (command === "info") {
 
-  if (!targetId || !dmContent) {
-    const container = new ContainerBuilder()
-      .setAccentColor(0x2b2d31)
-      .addTextDisplayComponents(
-        (text) => text.setContent(`## 📩 Usage Error`),
-        (text) => text.setContent(`Use: \`,memberdm @user your message here\``)
-      )
-      .addSeparatorComponents((sep) => sep.setDivider(true))
-      .addTextDisplayComponents(
-        (text) => text.setContent("-# Member DM System")
-      );
+      const servers = client.guilds.cache.size;
+      const users = client.guilds.cache.reduce((a, g) => a + g.memberCount, 0);
 
-    return message.reply({
-      components: [container],
-      flags: MessageFlags.IsComponentsV2,
-      allowedMentions: { repliedUser: false }
-    }).catch(() => {});
-  }
-
-  const target = await message.client.users.fetch(targetId).catch(() => null);
-  if (!target) {
-    return message.reply("Could not find that user.").catch(() => {});
-  }
-
-  await target.send(`📬 Message from ${message.author.tag}:\n\n${dmContent}`).catch(() => {
-    return message.reply("Failed to send DM.").catch(() => {});
-  });
-
-  cooldowns.set(senderId, now);
-
-  const container = new ContainerBuilder()
-    .setAccentColor(0x2b2d31)
-    .addTextDisplayComponents(
-      (text) => text.setContent(`## ✅ DM Sent`),
-      (text) => text.setContent(`Your message was sent to **${target.username}**.`)
-    )
-    .addSeparatorComponents((sep) => sep.setDivider(true))
-    .addTextDisplayComponents(
-      (text) => text.setContent("-# Member DM System")
-    );
-
-  return message.reply({
-    components: [container],
-    flags: MessageFlags.IsComponentsV2,
-    allowedMentions: { repliedUser: false }
-  }).catch(() => {});
-}
-
-if (command === "info") {
-
-  const servers = client.guilds.cache.size;
-  const users = client.guilds.cache.reduce((a, g) => a + g.memberCount, 0);
-
-  const container = new ContainerBuilder()
-    .setAccentColor(0x2b2d31)
-    .addTextDisplayComponents(text =>
-      text.setContent(
-`## 🧩 Ninja V2 — Bot Information
+      const container = new ContainerBuilder()
+        .setAccentColor(0x2b2d31)
+        .addTextDisplayComponents(text =>
+          text.setContent(
+            `## 🧩 Ninja V2 — Bot Information
 
 **Status:** Online
 **Servers:** ${servers}
@@ -959,182 +960,169 @@ if (command === "info") {
 https://ninjav2info.koyeb.app/
 
 Thank you for using Ninja V2.`
-      )
-    );
+          )
+        );
 
-  return message.reply({
-    components: [container],
-    flags: MessageFlags.IsComponentsV2,
-    allowedMentions: { repliedUser: false }
-  });
-}
-    
-const response = await fetch("https://api.waifu.pics/sfw/waifu");
+      return message.reply({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        allowedMentions: { repliedUser: false }
+      });
+    }
 
-if (command === "goon") {
-  try {
-    // Fetch a random SFW anime girl image
     const response = await fetch("https://api.waifu.pics/sfw/waifu");
-    const data = await response.json();
 
-    // DM the user secretly
-    await message.author.send({
-      content: "🔒 **Secret Delivery**\nHere’s your hidden anime girl…",
-      files: [data.url]
-    });
+    if (command === "goon") {
+      try {
+        // Fetch a random SFW anime girl image
+        const response = await fetch("https://api.waifu.pics/sfw/waifu");
+        const data = await response.json();
 
-    // Public reply
-    return message.reply({
-      content: "📩 Check your DMs.",
-      allowedMentions: { repliedUser: false }
-    });
+        // DM the user secretly
+        await message.author.send({
+          content: "🔒 **Secret Delivery**\nHere’s your hidden anime girl…",
+          files: [data.url]
+        });
 
-  } catch (err) {
-    console.error(err);
-    return message.reply("I couldn’t DM you. Make sure your DMs are open.");
-  }
-}
-    
+        // Public reply
+        return message.reply({
+          content: "📩 Check your DMs.",
+          allowedMentions: { repliedUser: false }
+        });
 
-if (command === "prophecy") {
-  const target = message.mentions.users.first() || message.author;
-
-  const visions = [
-    "a fracture forming in your timeline",
-    "an echo of yourself watching from the corner of reality",
-    "a forgotten memory trying to rewrite itself",
-    "a shadow that doesn’t belong to you",
-    "a glitch in the world that only you can see",
-    "a message hidden between the seconds",
-    "a version of you that made a different choice",
-    "a ripple in the simulation following your steps",
-    "a secret waiting beneath your next decision",
-    "a pattern forming around your presence"
-  ];
-
-  const omens = [
-    "the lights flicker at the wrong moment",
-    "your reflection hesitates before you do",
-    "a familiar sound plays from nowhere",
-    "someone says something you were about to think",
-    "a dream repeats itself with new details",
-    "you notice a symbol you’ve never seen before",
-    "a stranger recognizes you without meeting you",
-    "time feels slightly out of sync",
-    "you hear footsteps behind you with no source",
-    "your name appears where it shouldn’t"
-  ];
-
-  const outcomes = [
-    "a shift in your path",
-    "an unexpected encounter",
-    "a revelation you weren’t meant to see",
-    "a choice that branches reality",
-    "a moment that loops back later",
-    "a truth hidden in plain sight",
-    "a connection across timelines",
-    "a secret finally surfacing",
-    "a pattern completing itself",
-    "a door opening where none existed"
-  ];
-
-  const prophecy = {
-    vision: visions[Math.floor(Math.random() * visions.length)],
-    omen: omens[Math.floor(Math.random() * omens.length)],
-    outcome: outcomes[Math.floor(Math.random() * outcomes.length)]
-  };
-
-  const container = new ContainerBuilder()
-    .setAccentColor(0x2b2d31)
-    .addTextDisplayComponents(
-      (text) => text.setContent(`## 🔮 Prophecy for ${target.username}`),
-      (text) => text.setContent(`**Vision:** ${prophecy.vision}`),
-      (text) => text.setContent(`**Omen:** ${prophecy.omen}`),
-      (text) => text.setContent(`**Outcome:** ${prophecy.outcome}`)
-    )
-    .addSeparatorComponents((sep) => sep.setDivider(true))
-    .addTextDisplayComponents(
-      (text) => text.setContent("-# Prophecy System")
-    );
-
-  return message.reply({
-    components: [container],
-    flags: MessageFlags.IsComponentsV2,
-    allowedMentions: { repliedUser: false }
-  }).catch(() => {});
-}
-
-
-    
-
-import FMUser from "./models/fmUser.js";
-
-if (command === "setfm") {
-  const username = args[0];
-  if (!username) return message.reply("You must provide a Last.fm username.");
-
-  let user = await FMUser.findOne({ userId: message.author.id });
-
-  if (!user) {
-    user = new FMUser({
-      userId: message.author.id,
-      username
-    });
-  } else {
-    user.username = username;
-  }
-
-  await user.save();
-
-  return message.reply(`Your Last.fm username has been set to **${username}**`);
-}
-    
-    
-if (command === "fm") {
-  const username =
-    args[0] ||
-    (await client.db.get(`lastfm_${message.author.id}`));
-
-  if (!username)
-    return message.reply("You need to set your Last.fm username using `,setfm <username>`");
-
-  try {
-    const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${process.env.LASTFM_API_KEY}&format=json&limit=1`;
-
-    const response = await fetch(url);
-    const data = await response.json();
-
-    if (!data.recenttracks?.track?.length)
-      return message.reply("No tracks found for that user.");
-
-    const track = data.recenttracks.track[0];
-
-    const nowPlaying = track["@attr"]?.nowplaying === "true";
-
-    const artist = track.artist["#text"];
-    const song = track.name;
-    const album = track.album["#text"];
-    const cover = track.image?.[3]["#text"] || null;
-
-    const embed = {
-      color: 0xffffff,
-      title: nowPlaying ? "🎧 Now Playing" : "🎵 Last Played",
-      description: `**${song}**\nby **${artist}**\nAlbum: *${album || "Unknown"}*`,
-      thumbnail: cover ? { url: cover } : null,
-      footer: {
-        text: `Last.fm • ${username}`
+      } catch (err) {
+        console.error(err);
+        return message.reply("I couldn’t DM you. Make sure your DMs are open.");
       }
-    };
+    }
 
-    return message.reply({ embeds: [embed] });
 
-  } catch (err) {
-    console.error(err);
-    return message.reply("Error fetching Last.fm data.");
-  }
-}
+    if (command === "prophecy") {
+      const target = message.mentions.users.first() || message.author;
 
-    
+      const visions = [
+        "a fracture forming in your timeline",
+        "an echo of yourself watching from the corner of reality",
+        "a forgotten memory trying to rewrite itself",
+        "a shadow that doesn’t belong to you",
+        "a glitch in the world that only you can see",
+        "a message hidden between the seconds",
+        "a version of you that made a different choice",
+        "a ripple in the simulation following your steps",
+        "a secret waiting beneath your next decision",
+        "a pattern forming around your presence"
+      ];
+
+      const omens = [
+        "the lights flicker at the wrong moment",
+        "your reflection hesitates before you do",
+        "a familiar sound plays from nowhere",
+        "someone says something you were about to think",
+        "a dream repeats itself with new details",
+        "you notice a symbol you’ve never seen before",
+        "a stranger recognizes you without meeting you",
+        "time feels slightly out of sync",
+        "you hear footsteps behind you with no source",
+        "your name appears where it shouldn’t"
+      ];
+
+      const outcomes = [
+        "a shift in your path",
+        "an unexpected encounter",
+        "a revelation you weren’t meant to see",
+        "a choice that branches reality",
+        "a moment that loops back later",
+        "a truth hidden in plain sight",
+        "a connection across timelines",
+        "a secret finally surfacing",
+        "a pattern completing itself",
+        "a door opening where none existed"
+      ];
+
+      const prophecy = {
+        vision: visions[Math.floor(Math.random() * visions.length)],
+        omen: omens[Math.floor(Math.random() * omens.length)],
+        outcome: outcomes[Math.floor(Math.random() * outcomes.length)]
+      };
+
+      const container = new ContainerBuilder()
+        .setAccentColor(0x2b2d31)
+        .addTextDisplayComponents(
+          (text) => text.setContent(`## 🔮 Prophecy for ${target.username}`),
+          (text) => text.setContent(`**Vision:** ${prophecy.vision}`),
+          (text) => text.setContent(`**Omen:** ${prophecy.omen}`),
+          (text) => text.setContent(`**Outcome:** ${prophecy.outcome}`)
+        )
+        .addSeparatorComponents((sep) => sep.setDivider(true))
+        .addTextDisplayComponents(
+          (text) => text.setContent("-# Prophecy System")
+        );
+
+      return message.reply({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        allowedMentions: { repliedUser: false }
+      }).catch(() => { });
+    }
+
+
+
+
+
+
+    if (command === "setfm") {
+      const username = args[0];
+      if (!username) return message.reply("You must provide a Last.fm username.");
+
+      await setFMUser(message.author.id, username);
+
+      return message.reply(`Your Last.fm username has been set to **${username}**`);
+    }
+
+
+    if (command === "fm") {
+      const username = args[0] || (await getFMUser(message.author.id));
+
+      if (!username)
+        return message.reply("You need to set your Last.fm username using `,setfm <username>`");
+
+      try {
+        const url = `https://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user=${username}&api_key=${process.env.LASTFM_API_KEY}&format=json&limit=1`;
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!data.recenttracks?.track?.length)
+          return message.reply("No tracks found for that user.");
+
+        const track = data.recenttracks.track[0];
+
+        const nowPlaying = track["@attr"]?.nowplaying === "true";
+
+        const artist = track.artist["#text"];
+        const song = track.name;
+        const album = track.album["#text"];
+        const cover = track.image?.[3]["#text"] || null;
+
+        const embed = {
+          color: 0xffffff,
+          title: nowPlaying ? "🎧 Now Playing" : "🎵 Last Played",
+          description: `**${song}**\nby **${artist}**\nAlbum: *${album || "Unknown"}*`,
+          thumbnail: cover ? { url: cover } : null,
+          footer: {
+            text: `Last.fm • ${username}`
+          }
+        };
+
+        return message.reply({ embeds: [embed] });
+
+      } catch (err) {
+        console.error(err);
+        return message.reply("Error fetching Last.fm data.");
+      }
+    }
+
+
 
     if (command === "pokemon") {
       try {
@@ -1519,111 +1507,111 @@ if (command === "fm") {
       return message.reply('🍓🍓🍓🍓🍓🍓').catch(() => { });
     }
 
- if (command === "cat") {
-  try {
-    const res = await fetch("https://api.thecatapi.com/v1/images/search");
-    const data = await res.json();
+    if (command === "cat") {
+      try {
+        const res = await fetch("https://api.thecatapi.com/v1/images/search");
+        const data = await res.json();
 
-    if (!data || !data[0] || !data[0].url) {
-      return message.reply("Couldn't fetch a cat right now.");
+        if (!data || !data[0] || !data[0].url) {
+          return message.reply("Couldn't fetch a cat right now.");
+        }
+
+        const image = data[0].url;
+
+        const gallery = new MediaGalleryBuilder()
+          .addItems(
+            new MediaGalleryItemBuilder().setURL(image)
+          );
+
+        const container = new ContainerBuilder()
+          .setAccentColor(0x2b2d31)
+          .addTextDisplayComponents(text =>
+            text.setContent("## 🐱 Random Cat")
+          )
+          .addMediaGalleryComponents(gallery);
+
+        return message.reply({
+          components: [container],
+          flags: MessageFlags.IsComponentsV2,
+          allowedMentions: { repliedUser: false }
+        });
+
+      } catch (err) {
+        console.error(err);
+        return message.reply("Cat API failed.");
+      }
     }
 
-    const image = data[0].url;
 
-    const gallery = new MediaGalleryBuilder()
-      .addItems(
-        new MediaGalleryItemBuilder().setURL(image)
-      );
+    if (command === "dog") {
+      try {
+        const res = await fetch("https://dog.ceo/api/breeds/image/random");
+        const data = await res.json();
 
-    const container = new ContainerBuilder()
-      .setAccentColor(0x2b2d31)
-      .addTextDisplayComponents(text =>
-        text.setContent("## 🐱 Random Cat")
-      )
-      .addMediaGalleryComponents(gallery);
+        if (!data || !data.message) {
+          return message.reply("Couldn't fetch a dog right now.");
+        }
 
-    return message.reply({
-      components: [container],
-      flags: MessageFlags.IsComponentsV2,
-      allowedMentions: { repliedUser: false }
-    });
+        const image = data.message;
 
-  } catch (err) {
-    console.error(err);
-    return message.reply("Cat API failed.");
-  }
-}
+        const gallery = new MediaGalleryBuilder()
+          .addItems(
+            new MediaGalleryItemBuilder().setURL(image)
+          );
 
+        const container = new ContainerBuilder()
+          .setAccentColor(0x2b2d31)
+          .addTextDisplayComponents(text =>
+            text.setContent("## 🐶 Random Dog")
+          )
+          .addMediaGalleryComponents(gallery);
 
-if (command === "dog") {
-  try {
-    const res = await fetch("https://dog.ceo/api/breeds/image/random");
-    const data = await res.json();
+        return message.reply({
+          components: [container],
+          flags: MessageFlags.IsComponentsV2,
+          allowedMentions: { repliedUser: false }
+        });
 
-    if (!data || !data.message) {
-      return message.reply("Couldn't fetch a dog right now.");
+      } catch (err) {
+        console.error(err);
+        return message.reply("Dog API failed.");
+      }
     }
 
-    const image = data.message;
+    if (command === "bird") {
+      try {
+        const res = await fetch("https://some-random-api.com/img/birb");
+        const data = await res.json();
 
-    const gallery = new MediaGalleryBuilder()
-      .addItems(
-        new MediaGalleryItemBuilder().setURL(image)
-      );
+        if (!data || !data.link) {
+          return message.reply("Couldn't fetch a bird right now.");
+        }
 
-    const container = new ContainerBuilder()
-      .setAccentColor(0x2b2d31)
-      .addTextDisplayComponents(text =>
-        text.setContent("## 🐶 Random Dog")
-      )
-      .addMediaGalleryComponents(gallery);
+        const image = data.link;
 
-    return message.reply({
-      components: [container],
-      flags: MessageFlags.IsComponentsV2,
-      allowedMentions: { repliedUser: false }
-    });
+        const gallery = new MediaGalleryBuilder()
+          .addItems(
+            new MediaGalleryItemBuilder().setURL(image)
+          );
 
-  } catch (err) {
-    console.error(err);
-    return message.reply("Dog API failed.");
-  }
-}
+        const container = new ContainerBuilder()
+          .setAccentColor(0x2b2d31)
+          .addTextDisplayComponents(text =>
+            text.setContent("## 🐦 Random Bird")
+          )
+          .addMediaGalleryComponents(gallery);
 
-if (command === "bird") {
-  try {
-    const res = await fetch("https://some-random-api.com/img/birb");
-    const data = await res.json();
+        return message.reply({
+          components: [container],
+          flags: MessageFlags.IsComponentsV2,
+          allowedMentions: { repliedUser: false }
+        });
 
-    if (!data || !data.link) {
-      return message.reply("Couldn't fetch a bird right now.");
+      } catch (err) {
+        console.error(err);
+        return message.reply("Bird API failed.");
+      }
     }
-
-    const image = data.link;
-
-    const gallery = new MediaGalleryBuilder()
-      .addItems(
-        new MediaGalleryItemBuilder().setURL(image)
-      );
-
-    const container = new ContainerBuilder()
-      .setAccentColor(0x2b2d31)
-      .addTextDisplayComponents(text =>
-        text.setContent("## 🐦 Random Bird")
-      )
-      .addMediaGalleryComponents(gallery);
-
-    return message.reply({
-      components: [container],
-      flags: MessageFlags.IsComponentsV2,
-      allowedMentions: { repliedUser: false }
-    });
-
-  } catch (err) {
-    console.error(err);
-    return message.reply("Bird API failed.");
-  }
-}
 
 
 

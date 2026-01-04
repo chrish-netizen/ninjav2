@@ -14,7 +14,8 @@ const COLLECTIONS = {
   userProfiles: 'userProfiles',
   convoSummaries: 'convoSummaries',
   blacklist: 'blacklist',
-  commandUsage: 'commandUsage'
+  commandUsage: 'commandUsage',
+  fmUsers: 'fmUsers'
 };
 
 /**
@@ -26,14 +27,14 @@ export async function connectDB() {
     await client.connect();
     db = client.db(DB_NAME);
     console.log('✅ Connected to MongoDB');
-    
+
     // Create indexes for better performance
     await db.collection(COLLECTIONS.afkData).createIndex({ oduserId: 1 }, { unique: true, sparse: true });
     await db.collection(COLLECTIONS.msgData).createIndex({ oduserId: 1 }, { unique: true, sparse: true });
     await db.collection(COLLECTIONS.chatMemory).createIndex({ oduserId: 1 }, { unique: true, sparse: true });
     await db.collection(COLLECTIONS.userProfiles).createIndex({ oduserId: 1 }, { unique: true, sparse: true });
     await db.collection(COLLECTIONS.blacklist).createIndex({ oduserId: 1 }, { unique: true, sparse: true });
-    
+
     return db;
   } catch (error) {
     console.error('❌ MongoDB connection error:', error);
@@ -60,7 +61,6 @@ export async function closeDB() {
 }
 
 
-// ==================== AFK TOTALS (accumulated time) ====================
 
 export async function getAfkData(userId) {
   const doc = await db.collection(COLLECTIONS.afkData).findOne({ oduserId: userId });
@@ -84,7 +84,6 @@ export async function getAllAfkData() {
   return new Map(docs.map(doc => [doc.oduserId, doc.data]));
 }
 
-// ==================== AFK ACTIVE (currently AFK users) ====================
 
 export async function getAfkActive(userId) {
   const doc = await db.collection('afkActive').findOne({ oduserId: userId });
@@ -245,4 +244,23 @@ export async function setCommandUsage(usage) {
   }
 }
 
+
+export async function getFMUser(userId) {
+  const doc = await db.collection(COLLECTIONS.fmUsers).findOne({ oduserId: userId });
+  return doc?.username || null;
+}
+
+export async function setFMUser(userId, username) {
+  await db.collection(COLLECTIONS.fmUsers).updateOne(
+    { oduserId: userId },
+    { $set: { oduserId: userId, username, updatedAt: new Date() } },
+    { upsert: true }
+  );
+}
+
+export async function deleteFMUser(userId) {
+  await db.collection(COLLECTIONS.fmUsers).deleteOne({ oduserId: userId });
+}
+
 export { COLLECTIONS };
+
