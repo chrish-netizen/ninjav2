@@ -1064,16 +1064,38 @@ if (command === "prophecy") {
   }).catch(() => {});
 }
 
+import mongoose from "mongoose";
 
+const fmUserSchema = new mongoose.Schema({
+  userId: { type: String, required: true },
+  username: { type: String, required: true }
+});
+
+export default mongoose.model("FMUser", fmUserSchema);
+    
+
+import FMUser from "./models/fmUser.js";
 
 if (command === "setfm") {
-  const user = args[0];
-  if (!user) return message.reply("You need to provide a Last.fm username.");
+  const username = args[0];
+  if (!username) return message.reply("You must provide a Last.fm username.");
 
-  await client.db.set(`lastfm_${message.author.id}`, user);
+  let user = await FMUser.findOne({ userId: message.author.id });
 
-  return message.reply(`Your Last.fm username has been set to **${user}**`);
+  if (!user) {
+    user = new FMUser({
+      userId: message.author.id,
+      username
+    });
+  } else {
+    user.username = username;
+  }
+
+  await user.save();
+
+  return message.reply(`Your Last.fm username has been set to **${username}**`);
 }
+    
     
 if (command === "fm") {
   const username =
@@ -2509,6 +2531,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
