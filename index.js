@@ -1072,7 +1072,6 @@ Thank you for using Ninja V2.`
 
 
 
-
     if (command === "setfm") {
       const username = args[0];
       if (!username) return message.reply("You must provide a Last.fm username.");
@@ -2617,6 +2616,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
