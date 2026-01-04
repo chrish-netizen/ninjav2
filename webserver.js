@@ -40,6 +40,8 @@ export function startWebserver(client) {
               { name: ",ownerinfo", desc: "show the owners info" },
               { name: ",memberdm", desc: "DM any user with the command" },
               { name: ",servericon", desc: "show the servers icon" },
+              { name: ",setfm", desc: "Use this to link your last.fm account" },
+              { name: ",fm", desc: "shows song being scrobbled on last.fm" },
               { name: ",uptime", desc: "Bot uptime" }
             ]
           },
@@ -58,7 +60,8 @@ export function startWebserver(client) {
             title: "Leaderboard Commands",
             commands: [
               { name: ",msglb", desc: "Message leaderboard" },
-              { name: ",afklb", desc: "AFK leaderboard" }
+              { name: ",afklb", desc: "AFK leaderboard" },
+              { name: ",fmlb", desc: "Scrobbles leaderboard" }
             ]
           },
 
