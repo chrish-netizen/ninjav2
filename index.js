@@ -1114,15 +1114,89 @@ if (command === "fm") {
       }
     
 
-    if (command === "setfm") {
-      const username = args[0];
-      if (!username) return message.reply("You must provide a Last.fm username.");
+    // =========================
+// LAST.FM AUTH COMMAND
+// =========================
 
-      await setFMUser(message.author.id, username);
+if (command === "setfm") {
+  const authUrl = `https://www.last.fm/api/auth/?api_key=${process.env.LASTFM_API_KEY}&cb=${encodeURIComponent("https://yourdomain.com/lastfm/callback")}`;
 
-      return message.reply(`Your Last.fm username has been set to **${username}**`);
-    }
+  return message.reply(
+    `Click here to link your Last.fm account:\n${authUrl}`
+  );
+}
 
+
+// =========================
+// LAST.FM CALLBACK ROUTE
+// =========================
+
+app.get("/lastfm/callback", async (req, res) => {
+  const token = req.query.token;
+  const userId = req.session.discordId; // however you track the user
+
+  if (!token) return res.send("Missing token");
+
+  const apiSig = generateSig(token);
+
+  const url =
+    `https://ws.audioscrobbler.com/2.0/?method=auth.getSession` +
+    `&api_key=${process.env.LASTFM_API_KEY}` +
+    `&token=${token}` +
+    `&api_sig=${apiSig}` +
+    `&format=json`;
+
+  const response = await fetch(url);
+  const data = await response.json();
+
+  if (!data.session) {
+    return res.send("Failed to authenticate with Last.fm");
+  }
+
+  const { name, key } = data.session;
+
+  // =========================
+  // SAVE USER IN MONGODB
+  // =========================
+
+  const client = await mongoClient.connect(process.env.MONGO_URI);
+  const db = client.db("yourdbname");
+  const users = db.collection("fmUsers");
+
+  await users.updateOne(
+    { discordId: userId },
+    {
+      $set: {
+        discordId: userId,
+        lastfmUsername: name,
+        lastfmSessionKey: key
+      }
+    },
+    { upsert: true }
+  );
+
+  client.close();
+
+  return res.send("Your Last.fm account has been linked successfully.");
+});
+
+
+// =========================
+// SIGNATURE GENERATOR
+// =========================
+
+import crypto from "crypto";
+
+function generateSig(token) {
+  const str =
+    `api_key${process.env.LASTFM_API_KEY}` +
+    `methodauth.getSession` +
+    `token${token}` +
+    `${process.env.LASTFM_SECRET}`;
+
+  return crypto.createHash("md5").update(str).digest("hex");
+}
+    
 
 
    if (command === "fmlb") {
@@ -2662,6 +2736,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
