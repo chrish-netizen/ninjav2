@@ -1121,16 +1121,18 @@ if (command === "fm") {
 if (command === "setfm") {
   const authUrl = `https://www.last.fm/api/auth/?api_key=${process.env.LASTFM_API_KEY}&cb=${encodeURIComponent("https://yourdomain.com/lastfm/callback")}`;
 
-  const embed = {
-    title: "Last.fm Authorization",
-    description: `[Click here to authorize!](${authUrl})`,
-    color: 0xff0000,
-    footer: {
-      text: "Your Last.fm account will be linked securely."
-    }
-  };
+  const embed = new TextDisplayBuilder()
+    .setTitle("Last.fm Authorization")
+    .setDescription(`[Click here to authorize!](${authUrl})`)
+    .setColor(0xff0000)
+    .setFooter({ text: "Your Last.fm account will be linked securely." });
 
-  return message.reply({ embeds: [embed] });
+  const container = new ContainerBuilder();
+
+  return message.reply({
+    embeds: [embed],
+    components: [container]
+  });
 }
 
 
@@ -1202,7 +1204,10 @@ function generateSig(token) {
     `${process.env.LASTFM_SECRET}`;
 
   return crypto.createHash("md5").update(str).digest("hex");
-    }
+}
+    
+
+
     
     
 
@@ -2744,6 +2749,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
