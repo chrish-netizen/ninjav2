@@ -1113,20 +1113,21 @@ if (command === "fm") {
   }
       }
     
-
-  // =========================
+// =========================
 // LAST.FM AUTH COMMAND
 // =========================
 
 if (command === "setfm") {
   const authUrl = `https://www.last.fm/api/auth/?api_key=${process.env.LASTFM_API_KEY}&cb=${encodeURIComponent("https://yourdomain.com/lastfm/callback")}`;
 
-  const embed = new TextDisplayBuilder()
+  // v2 embed
+  const embed = new EmbedBuilder()
     .setTitle("Last.fm Authorization")
     .setDescription(`[Click here to authorize!](${authUrl})`)
     .setColor(0xff0000)
     .setFooter({ text: "Your Last.fm account will be linked securely." });
 
+  // v2 container (empty, because your original code had no buttons)
   const container = new ContainerBuilder();
 
   return message.reply({
@@ -1205,6 +1206,9 @@ function generateSig(token) {
 
   return crypto.createHash("md5").update(str).digest("hex");
 }
+  
+
+
     
 
 
@@ -2749,6 +2753,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
