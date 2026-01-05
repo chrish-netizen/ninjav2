@@ -1113,105 +1113,38 @@ if (command === "fm") {
     return message.reply("Error fetching Last.fm data.");
   }
       }
-// =========================
-// LAST.FM AUTH COMMAND
-// =========================
+
+    
 
 if (command === "setfm") {
-  const authUrl = `https://www.last.fm/api/auth/?api_key=${process.env.LASTFM_API_KEY}&cb=${encodeURIComponent("https://yourdomain.com/lastfm/callback")}`;
-
-  // Matches your other embeds EXACTLY (object-style embed)
-  const embed = {
-    title: "Last.fm Authorization",
-    description: `[Click here to authorize!](${authUrl})`,
-    color: 0xff0000,
-    footer: {
-      text: "Your Last.fm account will be linked securely."
-    }
-  };
-
-  return message.reply({
-    embeds: [embed]
-  });
-}
-
-
-// =========================
-// LAST.FM CALLBACK ROUTE
-// =========================
-
-app.get("/lastfm/callback", async (req, res) => {
-  const token = req.query.token;
-  const userId = req.session.discordId;
-
-  if (!token) return res.send("Missing token");
-
-  const apiSig = generateSig(token);
-
-  const url =
-    `https://ws.audioscrobbler.com/2.0/?method=auth.getSession` +
-    `&api_key=${process.env.LASTFM_API_KEY}` +
-    `&token=${token}` +
-    `&api_sig=${apiSig}` +
-    `&format=json`;
-
-  const response = await fetch(url);
-  const data = await response.json();
-
-  if (!data.session) {
-    return res.send("Failed to authenticate with Last.fm");
+  const username = args[0];
+  if (!username) {
+    return message.reply({
+      embeds: [{
+        title: "Last.fm Setup",
+        description: "Please provide your Last.fm username.\n\nExample: `,setfm seylun`",
+        color: 0xff0000
+      }]
+    });
   }
 
-  const { name, key } = data.session;
+  // Save to MongoDB using your existing helper
+  await setFMUser(message.author.id, {
+    lastfmUsername: username
+  });
 
-  // =========================
-  // SAVE USER IN MONGODB
-  // =========================
-
-  const client = await mongoClient.connect(process.env.MONGO_URI);
-  const db = client.db("yourdbname");
-  const users = db.collection("fmUsers");
-
-  await users.updateOne(
-    { discordId: userId },
-    {
-      $set: {
-        discordId: userId,
-        lastfmUsername: name,
-        lastfmSessionKey: key
+  return message.reply({
+    embeds: [{
+      title: "Last.fm Linked",
+      description: `Your Last.fm account **${username}** has been linked successfully.`,
+      color: 0xff0000,
+      footer: {
+        text: "Your Last.fm data is now saved."
       }
-    },
-    { upsert: true }
-  );
-
-  client.close();
-
-  return res.send("Your Last.fm account has been linked successfully.");
-});
-
-
-// =========================
-// SIGNATURE GENERATOR
-// =========================
-
-const crypto = require("crypto");
-
-function generateSig(token) {
-  const str =
-    `api_key${process.env.LASTFM_API_KEY}` +
-    `methodauth.getSession` +
-    `token${token}` +
-    `${process.env.LASTFM_SECRET}`;
-
-  return crypto.createHash("md5").update(str).digest("hex");
-        }
+    }]
+  });
+  }
     
-  
-
-
-    
-
-
     
     
 
@@ -2753,6 +2686,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
