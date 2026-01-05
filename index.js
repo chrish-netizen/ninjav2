@@ -615,6 +615,13 @@ client.on('messageCreate', async (message) => {
 
 
 
+    // ===================== JON COMMANDS ===================== //
+
+    if (command === "jon") {
+      return message.reply("https://giphy.com/gifs/c28QpXVZnANx9zaSgj");
+    }  if (command === "getjoned") {
+      return message.reply("https://i.imgur.com/QutFVcU.gif");
+    }
     // ===================== SNIPE COMMANDS ===================== //
 
     if (command === 'snipe') {
