@@ -1113,7 +1113,6 @@ if (command === "fm") {
     return message.reply("Error fetching Last.fm data.");
   }
       }
-    
 // =========================
 // LAST.FM AUTH COMMAND
 // =========================
@@ -1121,19 +1120,18 @@ if (command === "fm") {
 if (command === "setfm") {
   const authUrl = `https://www.last.fm/api/auth/?api_key=${process.env.LASTFM_API_KEY}&cb=${encodeURIComponent("https://yourdomain.com/lastfm/callback")}`;
 
-  // v2 embed
-  const embed = new EmbedBuilder()
-    .setTitle("Last.fm Authorization")
-    .setDescription(`[Click here to authorize!](${authUrl})`)
-    .setColor(0xff0000)
-    .setFooter({ text: "Your Last.fm account will be linked securely." });
-
-  // v2 container (empty, because your original code had no buttons)
-  const container = new ContainerBuilder();
+  // Matches your other embeds EXACTLY (object-style embed)
+  const embed = {
+    title: "Last.fm Authorization",
+    description: `[Click here to authorize!](${authUrl})`,
+    color: 0xff0000,
+    footer: {
+      text: "Your Last.fm account will be linked securely."
+    }
+  };
 
   return message.reply({
-    embeds: [embed],
-    components: [container]
+    embeds: [embed]
   });
 }
 
@@ -1144,7 +1142,7 @@ if (command === "setfm") {
 
 app.get("/lastfm/callback", async (req, res) => {
   const token = req.query.token;
-  const userId = req.session.discordId; // however you track the user
+  const userId = req.session.discordId;
 
   if (!token) return res.send("Missing token");
 
@@ -1206,7 +1204,8 @@ function generateSig(token) {
     `${process.env.LASTFM_SECRET}`;
 
   return crypto.createHash("md5").update(str).digest("hex");
-}
+        }
+    
   
 
 
@@ -2754,6 +2753,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
