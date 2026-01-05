@@ -13,6 +13,7 @@ import {
   getFMUser, setFMUser
 } from './database.js';
 import {
+  EmbedBuilder,
   Client,
   GatewayIntentBits,
   Partials,
@@ -2753,6 +2754,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
