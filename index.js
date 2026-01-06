@@ -788,41 +788,36 @@ if (command === "changelog") {
   const page = 0;
   const entry = changelog[page];
 
-  const embed = {
-    color: 0xff4d4d,
-    title: entry.title,
-    fields: [
-      {
-        name: "Version",
-        value: `\`${entry.version}\``,
-        inline: true
-      },
-      {
-        name: "Date",
-        value: `\`${entry.date}\``,
-        inline: true
-      },
-      {
-        name: "Changes",
-        value: entry.changes.map(c => `• ${c}`).join("\n")
-      }
-    ],
-    footer: {
-      text: `Page ${page + 1} of ${changelog.length}`
-    }
-  };
+  const embed = new EmbedBuilder()
+    .setColor(0xff4d4d)
+    .setTitle(entry.title)
+    .addFields(
+      { name: "Version", value: `\`${entry.version}\``, inline: true },
+      { name: "Date", value: `\`${entry.date}\``, inline: true },
+      { name: "Changes", value: entry.changes.map(c => `• ${c}`).join("\n") }
+    )
+    .setFooter({ text: `Page ${page + 1} of ${changelog.length}` });
 
-  const row = {
-    type: 1,
-    components: [
-      { type: 2, style: 2, label: "Previous", custom_id: `cl_prev_${page}` },
-      { type: 2, style: 2, label: "Next", custom_id: `cl_next_${page}` },
-      { type: 2, style: 1, label: "Latest", custom_id: `cl_latest` }
-    ]
-  };
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId(`cl_prev_${page}`)
+      .setLabel("Previous")
+      .setStyle(ButtonStyle.Secondary),
+
+    new ButtonBuilder()
+      .setCustomId(`cl_next_${page}`)
+      .setLabel("Next")
+      .setStyle(ButtonStyle.Secondary),
+
+    new ButtonBuilder()
+      .setCustomId("cl_latest")
+      .setLabel("Latest")
+      .setStyle(ButtonStyle.Primary)
+  );
 
   return message.reply({ embeds: [embed], components: [row] });
 }
+    
     
     
     
@@ -2430,54 +2425,64 @@ client.on('interactionCreate', async (interaction) => {
 
       return interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
     }
-client.on("interactionCreate", async i => {
+
+    client.on("interactionCreate", async i => {
   if (!i.isButton()) return;
 
-  // Extract page number if present
-  let page = parseInt(i.customId.split("_")[2]);
+  try {
+    let page = parseInt(i.customId.split("_")[2]);
 
-  // Handle button types
-  if (i.customId.startsWith("cl_prev")) {
-    page = Math.max(0, page - 1);
+    if (i.customId.startsWith("cl_prev")) {
+      page = Math.max(0, page - 1);
+    }
+
+    if (i.customId.startsWith("cl_next")) {
+      page = Math.min(changelog.length - 1, page + 1);
+    }
+
+    if (i.customId === "cl_latest") {
+      page = changelog.length - 1;
+    }
+
+    const entry = changelog[page];
+
+    const embed = new EmbedBuilder()
+      .setColor(0xff4d4d)
+      .setTitle(entry.title)
+      .addFields(
+        { name: "Version", value: `\`${entry.version}\``, inline: true },
+        { name: "Date", value: `\`${entry.date}\``, inline: true },
+        { name: "Changes", value: entry.changes.map(c => `• ${c}`).join("\n") }
+      )
+      .setFooter({ text: `Page ${page + 1} of ${changelog.length}` });
+
+    const row = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`cl_prev_${page}`)
+        .setLabel("Previous")
+        .setStyle(ButtonStyle.Secondary),
+
+      new ButtonBuilder()
+        .setCustomId(`cl_next_${page}`)
+        .setLabel("Next")
+        .setStyle(ButtonStyle.Secondary),
+
+      new ButtonBuilder()
+        .setCustomId("cl_latest")
+        .setLabel("Latest")
+        .setStyle(ButtonStyle.Primary)
+    );
+
+    await i.update({
+      embeds: [embed],
+      components: [row]
+    });
+
+  } catch (err) {
+    console.log("Interaction expired or invalid.");
   }
-
-  if (i.customId.startsWith("cl_next")) {
-    page = Math.min(changelog.length - 1, page + 1);
-  }
-
-  if (i.customId === "cl_latest") {
-    page = changelog.length - 1;
-  }
-
-  // Build embed for the new page
-  const entry = changelog[page];
-
-  const embed = {
-    title: entry.title,
-    description:
-      `**Version ${entry.version}** – ${entry.date}\n\n` +
-      entry.changes.map(c => `- ${c}`).join("\n"),
-    footer: { text: `Page ${page + 1} of ${changelog.length}` },
-    color: 0xff0000
-  };
-
-  // Rebuild buttons with updated page index
-  const row = {
-    type: 1,
-    components: [
-      { type: 2, style: 2, label: "Previous", custom_id: `cl_prev_${page}` },
-      { type: 2, style: 2, label: "Next", custom_id: `cl_next_${page}` },
-      { type: 2, style: 1, label: "Latest", custom_id: `cl_latest` }
-    ]
-  };
-
-  // Update the message
-  await i.update({
-    embeds: [embed],
-    components: [row]
-  });
 });
-    
+      
     // ============================================================
     // LEADERBOARD BUTTONS (AFK + MSG)
     // ============================================================
@@ -2563,6 +2568,7 @@ client.on("interactionCreate", async i => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
