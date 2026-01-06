@@ -791,8 +791,8 @@ if (command === "changelog") {
   const container = new ContainerBuilder()
     .setDisplay(
       new TextDisplayBuilder()
-        .setTile(entry.title)
-        .setDescription(
+        .set.title(entry.title)
+        .set.description(
           `**Version:** \`${entry.version}\`\n` +
           `**Date:** \`${entry.date}\`\n\n` +
           entry.changes.map(c => `• ${c}`).join("\n")
@@ -824,6 +824,7 @@ if (command === "changelog") {
     ui: [container]
   });
 }
+    
     
     
     
@@ -2435,8 +2436,7 @@ client.on('interactionCreate', async (interaction) => {
       return interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
     }
 
-    
-      client.on("interactionCreate", async i => {
+    client.on("interactionCreate", async i => {
   if (!i.isButton()) return;
 
   try {
@@ -2451,13 +2451,14 @@ client.on('interactionCreate', async (interaction) => {
     const container = new ContainerBuilder()
       .setDisplay(
         new TextDisplayBuilder()
-          .setTile(entry.title)
+          .setTitle(entry.title)
           .setDescription(
             `**Version:** \`${entry.version}\`\n` +
             `**Date:** \`${entry.date}\`\n\n` +
             entry.changes.map(c => `• ${c}`).join("\n")
           )
-      );
+      )
+      .setFooter(`Page ${page + 1} of ${changelog.length}`);
 
     const row = {
       type: 1,
@@ -2481,6 +2482,7 @@ client.on('interactionCreate', async (interaction) => {
 
     await i.update({
       components: [row],
+      embeds: [],
       ui: [container]
     });
 
@@ -2488,6 +2490,7 @@ client.on('interactionCreate', async (interaction) => {
     console.log("Interaction expired or invalid.");
   }
 });
+        
     
     // ============================================================
     // LEADERBOARD BUTTONS (AFK + MSG)
@@ -2574,6 +2577,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
