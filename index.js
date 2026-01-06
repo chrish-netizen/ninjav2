@@ -2461,7 +2461,7 @@ client.on("interactionCreate", async (i) => {
       )
       .addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true))
       .addActionRowComponents(
-        new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ActionRowBuilder().addComponents(
           new ButtonBuilder()
             .setCustomId(`cl_prev_${page}`)
             .setLabel("Previous")
@@ -2575,6 +2575,7 @@ client.on("interactionCreate", async (i) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
