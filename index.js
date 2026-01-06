@@ -807,8 +807,8 @@ Thank you for using Ninja V2.`
     const container = new ContainerBuilder()
       .setDisplay(
         new TextDisplayBuilder()
-          .set.title(entry.title)
-          .set.description(
+          .setTitle(entry.title)
+          .setDescription(
             `**Version:** \`${entry.version}\`\n` +
             `**Date:** \`${entry.date}\`\n\n` +
             entry.changes.map(c => `• ${c}`).join("\n") +
