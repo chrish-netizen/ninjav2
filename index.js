@@ -788,35 +788,45 @@ if (command === "changelog") {
   const page = 0;
   const entry = changelog[page];
 
-  const embed = new EmbedBuilder()
-    .setColor(0xff4d4d)
-    .setTitle(entry.title)
-    .addFields(
-      { name: "Version", value: `\`${entry.version}\``, inline: true },
-      { name: "Date", value: `\`${entry.date}\``, inline: true },
-      { name: "Changes", value: entry.changes.map(c => `• ${c}`).join("\n") }
+  const container = new ContainerBuilder()
+    .setDisplay(
+      new TextDisplayBuilder()
+        .setTitle(entry.title)
+        .setDescription(
+          `**Version:** \`${entry.version}\`\n` +
+          `**Date:** \`${entry.date}\`\n\n` +
+          entry.changes.map(c => `• ${c}`).join("\n")
+        )
     )
-    .setFooter({ text: `Page ${page + 1} of ${changelog.length}` });
+    .setFooter(`Page ${page + 1} of ${changelog.length}`);
 
-  const row = new ActionRowBuilder().addComponents(
-    new ButtonBuilder()
-      .setCustomId(`cl_prev_${page}`)
-      .setLabel("Previous")
-      .setStyle(ButtonStyle.Secondary),
+  const row = {
+    type: 1,
+    components: [
+      new ButtonBuilder()
+        .setCustomId(`cl_prev_${page}`)
+        .setLabel("Previous")
+        .setStyle(ButtonStyle.Secondary),
 
-    new ButtonBuilder()
-      .setCustomId(`cl_next_${page}`)
-      .setLabel("Next")
-      .setStyle(ButtonStyle.Secondary),
+      new ButtonBuilder()
+        .setCustomId(`cl_next_${page}`)
+        .setLabel("Next")
+        .setStyle(ButtonStyle.Secondary),
 
-    new ButtonBuilder()
-      .setCustomId("cl_latest")
-      .setLabel("Latest")
-      .setStyle(ButtonStyle.Primary)
-  );
+      new ButtonBuilder()
+        .setCustomId("cl_latest")
+        .setLabel("Latest")
+        .setStyle(ButtonStyle.Primary)
+    ]
+  };
 
-  return message.reply({ embeds: [embed], components: [row] });
+  return message.reply({
+    components: [row],
+    embeds: [],
+    ui: [container] // THIS is the new v2 UI system
+  });
 }
+    
     
     
     
@@ -2426,62 +2436,61 @@ client.on('interactionCreate', async (interaction) => {
       return interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
     }
 
-    client.on("interactionCreate", async i => {
+  client.on("interactionCreate", async i => {
   if (!i.isButton()) return;
 
   try {
     let page = parseInt(i.customId.split("_")[2]);
 
-    if (i.customId.startsWith("cl_prev")) {
-      page = Math.max(0, page - 1);
-    }
-
-    if (i.customId.startsWith("cl_next")) {
-      page = Math.min(changelog.length - 1, page + 1);
-    }
-
-    if (i.customId === "cl_latest") {
-      page = changelog.length - 1;
-    }
+    if (i.customId.startsWith("cl_prev")) page = Math.max(0, page - 1);
+    if (i.customId.startsWith("cl_next")) page = Math.min(changelog.length - 1, page + 1);
+    if (i.customId === "cl_latest") page = changelog.length - 1;
 
     const entry = changelog[page];
 
-    const embed = new EmbedBuilder()
-      .setColor(0xff4d4d)
-      .setTitle(entry.title)
-      .addFields(
-        { name: "Version", value: `\`${entry.version}\``, inline: true },
-        { name: "Date", value: `\`${entry.date}\``, inline: true },
-        { name: "Changes", value: entry.changes.map(c => `• ${c}`).join("\n") }
+    const container = new ContainerBuilder()
+      .setDisplay(
+        new TextDisplayBuilder()
+          .setTitle(entry.title)
+          .setDescription(
+            `**Version:** \`${entry.version}\`\n` +
+            `**Date:** \`${entry.date}\`\n\n` +
+            entry.changes.map(c => `• ${c}`).join("\n")
+          )
       )
-      .setFooter({ text: `Page ${page + 1} of ${changelog.length}` });
+      .setFooter(`Page ${page + 1} of ${changelog.length}`);
 
-    const row = new ActionRowBuilder().addComponents(
-      new ButtonBuilder()
-        .setCustomId(`cl_prev_${page}`)
-        .setLabel("Previous")
-        .setStyle(ButtonStyle.Secondary),
+    const row = {
+      type: 1,
+      components: [
+        new ButtonBuilder()
+          .setCustomId(`cl_prev_${page}`)
+          .setLabel("Previous")
+          .setStyle(ButtonStyle.Secondary),
 
-      new ButtonBuilder()
-        .setCustomId(`cl_next_${page}`)
-        .setLabel("Next")
-        .setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder()
+          .setCustomId(`cl_next_${page}`)
+          .setLabel("Next")
+          .setStyle(ButtonStyle.Secondary),
 
-      new ButtonBuilder()
-        .setCustomId("cl_latest")
-        .setLabel("Latest")
-        .setStyle(ButtonStyle.Primary)
-    );
+        new ButtonBuilder()
+          .setCustomId("cl_latest")
+          .setLabel("Latest")
+          .setStyle(ButtonStyle.Primary)
+      ]
+    };
 
     await i.update({
-      embeds: [embed],
-      components: [row]
+      components: [row],
+      embeds: [],
+      ui: [container]
     });
 
   } catch (err) {
     console.log("Interaction expired or invalid.");
   }
 });
+    
       
     // ============================================================
     // LEADERBOARD BUTTONS (AFK + MSG)
@@ -2568,6 +2577,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
