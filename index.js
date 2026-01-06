@@ -921,7 +921,8 @@ Thank you for using Ninja V2.`
       });
     }
 
-
+        
+      
 if (command === "time") {
   try {
     const profile = await getUserProfile(message.author.id);
@@ -938,8 +939,8 @@ if (command === "time") {
         const container = new ContainerBuilder()
           .setDisplay(
             new TextDisplayBuilder()
-              .set.title("⏰ Your Time")
-              .set.description(
+              .setTitle("⏰ Your Time")
+              .setDescription(
                 `**Timezone:** ${profile.timezone}\n` +
                 `**Current Time:** ${now}`
               )
@@ -973,8 +974,8 @@ if (command === "time") {
     const container = new ContainerBuilder()
       .setDisplay(
         new TextDisplayBuilder()
-          .set.title("⏰ Select Your Timezone")
-          .set.description("Choose your timezone from the menu below to save it.")
+          .setTitle("⏰ Select Your Timezone")
+          .setDescription("Choose your timezone from the menu below to save it.")
       );
     
     const timezones = [
@@ -1058,8 +1059,8 @@ if (command === "timeunlink") {
       const container = new ContainerBuilder()
         .setDisplay(
           new TextDisplayBuilder()
-            .set.title("❌ No Timezone Set")
-            .set.description("You don't have a timezone saved. Use `,time` to set one!")
+            .setTitle("❌ No Timezone Set")
+            .setDescription("You don't have a timezone saved. Use `,time` to set one!")
         );
       
       return message.reply({ ui: [container] });
@@ -1071,8 +1072,8 @@ if (command === "timeunlink") {
     const container = new ContainerBuilder()
       .setDisplay(
         new TextDisplayBuilder()
-          .set.title("✅ Timezone Removed")
-          .set.description("Your timezone has been removed successfully.")
+          .setTitle("✅ Timezone Removed")
+          .setDescription("Your timezone has been removed successfully.")
       );
     
     return message.reply({ ui: [container] });
@@ -1081,34 +1082,7 @@ if (command === "timeunlink") {
     console.error("Timeunlink command error:", error);
     return message.reply("An error occurred while removing your timezone.");
   }
-            }
-
-    if (command === "luck") {
-      const luck = Math.floor(Math.random() * 101); // 0–100%
-
-      let messageText = "";
-
-      if (luck >= 90) messageText = "✨ Incredible luck today!";
-      else if (luck >= 70) messageText = "🍀 You're pretty lucky right now.";
-      else if (luck >= 40) messageText = "🙂 Average luck. Could go either way.";
-      else if (luck >= 20) messageText = "😬 Not looking great...";
-      else messageText = "💀 Your luck is in the bin.";
-
-      const container = new ContainerBuilder()
-        .setAccentColor(0x2b2d31)
-        .addTextDisplayComponents(text =>
-          text.setContent(`## 🍀 Luck Check\n**${luck}%** — ${messageText}`)
-        );
-
-      return message.reply({
-        components: [container],
-        flags: MessageFlags.IsComponentsV2,
-        allowedMentions: { repliedUser: false }
-      });
-    }
-
-
-
+       }
 
     if (command === "memberdm") {
       const senderId = message.author.id;
@@ -2693,9 +2667,25 @@ client.on('interactionCreate', async (interaction) => {
         
     
 
-// Handle select menus
+    const row = {
+      type: 1,
+      components: [selectMenu]
+    };
+    
+    await interaction.update({
+      ui: [container],
+      components: [row]
+    });
+  } catch (error) {
+    console.error("Time change button error:", error);
+    await interaction.reply({ content: "An error occurred!", ephemeral: true });
+  }
+}
 
-    if (interaction.isStringSelectMenu()) {
+
+
+// Handle select menus
+if (interaction.isStringSelectMenu()) {
   if (interaction.customId === "time_select") {
     try {
       const timezone = interaction.values[0];
@@ -2715,8 +2705,8 @@ client.on('interactionCreate', async (interaction) => {
       const container = new ContainerBuilder()
         .setDisplay(
           new TextDisplayBuilder()
-            .set.title("✅ Timezone Saved")
-            .set.description(
+            .setTitle("✅ Timezone Saved")
+            .setDescription(
               `**Timezone:** ${timezone}\n` +
               `**Current Time:** ${now}\n\n` +
               `Use \`,time\` anytime to check your current time!`
@@ -2740,8 +2730,8 @@ if (interaction.customId === "time_change") {
     const container = new ContainerBuilder()
       .setDisplay(
         new TextDisplayBuilder()
-          .set.title("⏰ Select Your Timezone")
-          .set.description("Choose your timezone from the menu below to update it.")
+          .setTitle("⏰ Select Your Timezone")
+          .setDescription("Choose your timezone from the menu below to update it.")
       );
     
     const timezones = [
@@ -2828,8 +2818,8 @@ if (interaction.customId === "time_unlink") {
     const container = new ContainerBuilder()
       .setDisplay(
         new TextDisplayBuilder()
-          .set.title("✅ Timezone Removed")
-          .set.description("Your timezone has been removed successfully.")
+          .setTitle("✅ Timezone Removed")
+          .setDescription("Your timezone has been removed successfully.")
       );
     
     await interaction.update({
@@ -2840,7 +2830,7 @@ if (interaction.customId === "time_unlink") {
     console.error("Time unlink button error:", error);
     await interaction.reply({ content: "An error occurred!", ephemeral: true });
   }
-      }
+}
     // ============================================================
     // LEADERBOARD BUTTONS (AFK + MSG)
     // ============================================================
@@ -2926,6 +2916,7 @@ if (interaction.customId === "time_unlink") {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
