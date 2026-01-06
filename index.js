@@ -2503,7 +2503,7 @@ client.on('interactionCreate', async (interaction) => {
       ui: [container]
     });
   }
-
+}); 
         
     
     // ============================================================
@@ -2591,6 +2591,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
