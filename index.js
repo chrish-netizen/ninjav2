@@ -32,6 +32,19 @@ import {
 import fetch from 'node-fetch';
 let lastRestartChannel = null;
 
+const changelog = [
+  {
+    version: "1.4.11",
+    date: "2026-01-05",
+    title: "Last.fm Improvements",
+    changes: [
+      "Merged all Last.fm commands into `fm`",
+      "Auto-confirm after authorizing on website",
+      "Fixed commands using hardcoded prefix",
+      "Added changelog command"
+    ]
+  }
+];
 
 /* ===================== CONFIG ===================== */
 
@@ -2531,6 +2544,7 @@ client.on("interactionCreate", async i => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
