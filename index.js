@@ -2436,58 +2436,74 @@ client.on('interactionCreate', async (interaction) => {
       return interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
     }
 
-    
-    // Button interaction handler
-client.on("interactionCreate", async (i) => {
-  if (!i.isButton()) return;
+    // ===== BUTTON INTERACTION HANDLER =====
+// Put this in your interactionCreate event handler
+client.on('interactionCreate', async (interaction) => {
+  if (!interaction.isButton()) return;
 
-  try {
-    let page = parseInt(i.customId.split("_")[2]) || 0;
+  const customId = interaction.customId;
 
-    if (i.customId.startsWith("cl_prev")) page = Math.max(0, page - 1);
-    if (i.customId.startsWith("cl_next")) page = Math.min(changelog.length - 1, page + 1);
-    if (i.customId === "cl_latest") page = changelog.length - 1;
+  // Changelog button handlers
+  if (customId.startsWith('cl_')) {
+    if (!changelog || changelog.length === 0) {
+      return interaction.reply({ content: "No changelog entries found!", ephemeral: true });
+    }
+
+    let page = 0;
+
+    if (customId.startsWith('cl_prev_')) {
+      page = parseInt(customId.split('_')[2]) - 1;
+      page = Math.max(0, page);
+    } else if (customId.startsWith('cl_next_')) {
+      page = parseInt(customId.split('_')[2]) + 1;
+      page = Math.min(changelog.length - 1, page);
+    } else if (customId === 'cl_latest') {
+      page = 0;
+    }
 
     const entry = changelog[page];
 
     const container = new ContainerBuilder()
-      .addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${entry.title}`))
-      .addTextDisplayComponents(
-        new TextDisplayBuilder().setContent(
-          `**Version:** \`${entry.version}\`\n` +
-          `**Date:** \`${entry.date}\`\n\n` +
-          entry.changes.map((c) => `• ${c}`).join("\n")
-        )
-      )
-      .addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true))
-      .addActionRowComponents(
-    new ActionRowBuilder().addComponents(
-          new ButtonBuilder()
-            .setCustomId(`cl_prev_${page}`)
-            .setLabel("Previous")
-            .setStyle(ButtonStyle.Secondary)
-            .setDisabled(page === 0),
-          new ButtonBuilder()
-            .setCustomId(`cl_next_${page}`)
-            .setLabel("Next")
-            .setStyle(ButtonStyle.Secondary)
-            .setDisabled(page === changelog.length - 1),
-          new ButtonBuilder()
-            .setCustomId("cl_latest")
-            .setLabel("Latest")
-            .setStyle(ButtonStyle.Primary)
-        )
-      )
-      .addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# Page ${page + 1} of ${changelog.length}`));
+      .setDisplay(
+        new TextDisplayBuilder()
+          .set.title(entry.title)
+          .set.description(
+            `**Version:** \`${entry.version}\`\n` +
+            `**Date:** \`${entry.date}\`\n\n` +
+            entry.changes.map(c => `• ${c}`).join("\n") +
+            `\n\n*Page ${page + 1} of ${changelog.length}*`
+          )
+      );
 
-    await i.update({
-      components: [container],
-      flags: MessageFlags.IsComponentsV2,
+    const row = {
+      type: 1,
+      components: [
+        new ButtonBuilder()
+          .setCustomId(`cl_prev_${page}`)
+          .setLabel("Previous")
+          .setStyle(ButtonStyle.Secondary)
+          .setDisabled(page === 0),
+
+        new ButtonBuilder()
+          .setCustomId(`cl_next_${page}`)
+          .setLabel("Next")
+          .setStyle(ButtonStyle.Secondary)
+          .setDisabled(page === changelog.length - 1),
+
+        new ButtonBuilder()
+          .setCustomId("cl_latest")
+          .setLabel("Latest")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(page === 0)
+      ]
+    };
+
+    await interaction.update({
+      components: [row],
+      ui: [container]
     });
-  } catch (err) {
-    console.log("Interaction expired or invalid.");
   }
-});
+
         
     
     // ============================================================
@@ -2575,6 +2591,7 @@ client.on("interactionCreate", async (i) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
