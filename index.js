@@ -2436,11 +2436,13 @@ client.on('interactionCreate', async (interaction) => {
       return interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
     }
 
-    client.on("interactionCreate", async i => {
+    
+    // Button interaction handler
+client.on("interactionCreate", async (i) => {
   if (!i.isButton()) return;
 
   try {
-    let page = parseInt(i.customId.split("_")[2]);
+    let page = parseInt(i.customId.split("_")[2]) || 0;
 
     if (i.customId.startsWith("cl_prev")) page = Math.max(0, page - 1);
     if (i.customId.startsWith("cl_next")) page = Math.min(changelog.length - 1, page + 1);
@@ -2449,43 +2451,39 @@ client.on('interactionCreate', async (interaction) => {
     const entry = changelog[page];
 
     const container = new ContainerBuilder()
-      .setDisplay(
-        new TextDisplayBuilder()
-          .setTitle(entry.title)
-          .setDescription(
-            `**Version:** \`${entry.version}\`\n` +
-            `**Date:** \`${entry.date}\`\n\n` +
-            entry.changes.map(c => `• ${c}`).join("\n")
-          )
+      .addTextDisplayComponents(new TextDisplayBuilder().setContent(`## ${entry.title}`))
+      .addTextDisplayComponents(
+        new TextDisplayBuilder().setContent(
+          `**Version:** \`${entry.version}\`\n` +
+          `**Date:** \`${entry.date}\`\n\n` +
+          entry.changes.map((c) => `• ${c}`).join("\n")
+        )
       )
-      .setFooter(`Page ${page + 1} of ${changelog.length}`);
-
-    const row = {
-      type: 1,
-      components: [
-        new ButtonBuilder()
-          .setCustomId(`cl_prev_${page}`)
-          .setLabel("Previous")
-          .setStyle(ButtonStyle.Secondary),
-
-        new ButtonBuilder()
-          .setCustomId(`cl_next_${page}`)
-          .setLabel("Next")
-          .setStyle(ButtonStyle.Secondary),
-
-        new ButtonBuilder()
-          .setCustomId("cl_latest")
-          .setLabel("Latest")
-          .setStyle(ButtonStyle.Primary)
-      ]
-    };
+      .addSeparatorComponents(new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true))
+      .addActionRowComponents(
+        new ActionRowBuilder<ButtonBuilder>().addComponents(
+          new ButtonBuilder()
+            .setCustomId(`cl_prev_${page}`)
+            .setLabel("Previous")
+            .setStyle(ButtonStyle.Secondary)
+            .setDisabled(page === 0),
+          new ButtonBuilder()
+            .setCustomId(`cl_next_${page}`)
+            .setLabel("Next")
+            .setStyle(ButtonStyle.Secondary)
+            .setDisabled(page === changelog.length - 1),
+          new ButtonBuilder()
+            .setCustomId("cl_latest")
+            .setLabel("Latest")
+            .setStyle(ButtonStyle.Primary)
+        )
+      )
+      .addTextDisplayComponents(new TextDisplayBuilder().setContent(`-# Page ${page + 1} of ${changelog.length}`));
 
     await i.update({
-      components: [row],
-      embeds: [],
-      ui: [container]
+      components: [container],
+      flags: MessageFlags.IsComponentsV2,
     });
-
   } catch (err) {
     console.log("Interaction expired or invalid.");
   }
@@ -2577,6 +2575,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
