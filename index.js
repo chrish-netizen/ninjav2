@@ -787,58 +787,66 @@ Thank you for using Ninja V2.`
     
     
     if (command === "changelog") {
-  // Add safety checks
-  if (!changelog || changelog.length === 0) {
-    return message.reply("No changelog entries available.");
+  try {
+    // Bulletproof checks
+    if (!changelog || !Array.isArray(changelog) || changelog.length === 0) {
+      return message.reply("No changelog entries available.");
+    }
+
+    const page = 0;
+    const entry = changelog[page];
+    
+    if (!entry || typeof entry !== 'object') {
+      return message.reply("Could not load changelog entry.");
+    }
+
+    if (!entry.title || !entry.version || !entry.date || !entry.changes) {
+      return message.reply("Changelog entry is missing required fields.");
+    }
+
+    const container = new ContainerBuilder()
+      .setDisplay(
+        new TextDisplayBuilder()
+          .set.title(entry.title)
+          .set.description(
+            `**Version:** \`${entry.version}\`\n` +
+            `**Date:** \`${entry.date}\`\n\n` +
+            entry.changes.map(c => `• ${c}`).join("\n") +
+            `\n\n*Page ${page + 1} of ${changelog.length}*`
+          )
+      );
+
+    const row = {
+      type: 1,
+      components: [
+        new ButtonBuilder()
+          .setCustomId(`cl_prev_${page}`)
+          .setLabel("Previous")
+          .setStyle(ButtonStyle.Secondary)
+          .setDisabled(page === 0),
+
+        new ButtonBuilder()
+          .setCustomId(`cl_next_${page}`)
+          .setLabel("Next")
+          .setStyle(ButtonStyle.Secondary)
+          .setDisabled(page === changelog.length - 1),
+
+        new ButtonBuilder()
+          .setCustomId("cl_latest")
+          .setLabel("Latest")
+          .setStyle(ButtonStyle.Primary)
+          .setDisabled(page === 0)
+      ]
+    };
+
+    return message.reply({
+      components: [row],
+      ui: [container]
+    });
+  } catch (error) {
+    console.error("Changelog command error:", error);
+    return message.reply("An error occurred loading the changelog.");
   }
-
-  const page = 0;
-  const entry = changelog[page];
-  
-  // Extra safety - this should catch the issue
-  if (!entry) {
-    return message.reply("Could not load changelog entry.");
-  }
-
-  const container = new ContainerBuilder()
-    .setDisplay(
-      new TextDisplayBuilder()
-        .set.title(entry.title)
-        .set.description(
-          `**Version:** \`${entry.version}\`\n` +
-          `**Date:** \`${entry.date}\`\n\n` +
-          entry.changes.map(c => `• ${c}`).join("\n") +
-          `\n\n*Page ${page + 1} of ${changelog.length}*`
-        )
-    );
-
-  const row = {
-    type: 1,
-    components: [
-      new ButtonBuilder()
-        .setCustomId(`cl_prev_${page}`)
-        .setLabel("Previous")
-        .setStyle(ButtonStyle.Secondary)
-        .setDisabled(page === 0),
-
-      new ButtonBuilder()
-        .setCustomId(`cl_next_${page}`)
-        .setLabel("Next")
-        .setStyle(ButtonStyle.Secondary)
-        .setDisabled(page === changelog.length - 1),
-
-      new ButtonBuilder()
-        .setCustomId("cl_latest")
-        .setLabel("Latest")
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(page === 0)
-    ]
-  };
-
-  return message.reply({
-    components: [row],
-    ui: [container]
-  });
     }
     
     
@@ -2603,6 +2611,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
