@@ -34,14 +34,13 @@ let lastRestartChannel = null;
 
 const changelog = [
   {
-    version: "1.4.11",
-    date: "2026-01-05",
-    title: "Last.fm Improvements",
+    version: "1.0.0",
+    date: "2026-01-06",
+    title: "Main Improvements",
     changes: [
-      "Merged all Last.fm commands into `fm`",
-      "Auto-confirm after authorizing on website",
-      "Fixed commands using hardcoded prefix",
-      "Added changelog command"
+      "Added a ,changelog command",
+      "Fixed afk storing",
+      "Fixed the bots persona",
     ]
   }
 ];
@@ -176,6 +175,8 @@ Behavior rules:
 - Max 3 short sentences.
 - when asked who is your owner reply with my owner/creator is <@1438381425584771244> if you have any questions about me you can dm him!
 -never say @everyone or @here
+- when asked a question about a topic respond with detailed info only do this for proper questions
+
 - answer all questions the user asks
 - try to be funny 
 - when asked how do i contact your owner respond with my owners user name is: seyluns there you can contact him.
@@ -320,6 +321,7 @@ const HELP_CATEGORIES = {
       { name: ',ownerinfo', desc: 'show the owners info' },
       { name: ',memberdm', desc: 'DM any user with the command' },
       { name: ',servericon', desc: 'show the servers icon' },
+      { name: ',changelog', desc: 'show all bot updates' },
       { name: ',uptime', desc: 'Bot uptime' }
     ]
   },
@@ -787,11 +789,27 @@ if (command === "changelog") {
   const entry = changelog[page];
 
   const embed = {
+    color: 0xff4d4d,
     title: entry.title,
-    description: `**Version ${entry.version}** – ${entry.date}\n\n` +
-                 entry.changes.map(c => `- ${c}`).join("\n"),
-    footer: { text: `Page ${page + 1} of ${changelog.length}` },
-    color: 0xff0000
+    fields: [
+      {
+        name: "Version",
+        value: `\`${entry.version}\``,
+        inline: true
+      },
+      {
+        name: "Date",
+        value: `\`${entry.date}\``,
+        inline: true
+      },
+      {
+        name: "Changes",
+        value: entry.changes.map(c => `• ${c}`).join("\n")
+      }
+    ],
+    footer: {
+      text: `Page ${page + 1} of ${changelog.length}`
+    }
   };
 
   const row = {
@@ -805,6 +823,7 @@ if (command === "changelog") {
 
   return message.reply({ embeds: [embed], components: [row] });
 }
+    
     
     
     if (command === "fox") {
@@ -2544,6 +2563,7 @@ client.on("interactionCreate", async i => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
