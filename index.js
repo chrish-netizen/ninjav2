@@ -784,9 +784,21 @@ Thank you for using Ninja V2.`
       });
     }
 
-if (command === "changelog") {
+    
+    
+    if (command === "changelog") {
+  // Add safety checks
+  if (!changelog || changelog.length === 0) {
+    return message.reply("No changelog entries available.");
+  }
+
   const page = 0;
   const entry = changelog[page];
+  
+  // Extra safety - this should catch the issue
+  if (!entry) {
+    return message.reply("Could not load changelog entry.");
+  }
 
   const container = new ContainerBuilder()
     .setDisplay(
@@ -795,7 +807,8 @@ if (command === "changelog") {
         .set.description(
           `**Version:** \`${entry.version}\`\n` +
           `**Date:** \`${entry.date}\`\n\n` +
-          entry.changes.map(c => `• ${c}`).join("\n")
+          entry.changes.map(c => `• ${c}`).join("\n") +
+          `\n\n*Page ${page + 1} of ${changelog.length}*`
         )
     );
 
@@ -805,17 +818,20 @@ if (command === "changelog") {
       new ButtonBuilder()
         .setCustomId(`cl_prev_${page}`)
         .setLabel("Previous")
-        .setStyle(ButtonStyle.Secondary),
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(page === 0),
 
       new ButtonBuilder()
         .setCustomId(`cl_next_${page}`)
         .setLabel("Next")
-        .setStyle(ButtonStyle.Secondary),
+        .setStyle(ButtonStyle.Secondary)
+        .setDisabled(page === changelog.length - 1),
 
       new ButtonBuilder()
         .setCustomId("cl_latest")
         .setLabel("Latest")
         .setStyle(ButtonStyle.Primary)
+        .setDisabled(page === 0)
     ]
   };
 
@@ -823,11 +839,7 @@ if (command === "changelog") {
     components: [row],
     ui: [container]
   });
-}
-    
-    
-    
-    
+    }
     
     
     
@@ -2591,6 +2603,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
