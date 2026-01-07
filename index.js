@@ -785,78 +785,78 @@ Thank you for using Ninja V2.`
       });
     }
 
-    
-    
+
+
     if (command === "changelog") {
-  try {
-    // Bulletproof checks
-    if (!changelog || !Array.isArray(changelog) || changelog.length === 0) {
-      return message.reply("No changelog entries available.");
+      try {
+        // Bulletproof checks
+        if (!changelog || !Array.isArray(changelog) || changelog.length === 0) {
+          return message.reply("No changelog entries available.");
+        }
+
+        const page = 0;
+        const entry = changelog[page];
+
+        if (!entry || typeof entry !== 'object') {
+          return message.reply("Could not load changelog entry.");
+        }
+
+        if (!entry.title || !entry.version || !entry.date || !entry.changes) {
+          return message.reply("Changelog entry is missing required fields.");
+        }
+
+        const container = new ContainerBuilder()
+          .addTextDisplayComponents(
+            new TextDisplayBuilder()
+              .setContent(`## ${entry.title}\n**Version:** \`${entry.version}\`\n**Date:** \`${entry.date}\``)
+          )
+          .addSeparatorComponents(
+            new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true)
+          )
+          .addTextDisplayComponents(
+            new TextDisplayBuilder()
+              .setContent(entry.changes.map(c => `• ${c}`).join("\n"))
+          )
+          .addTextDisplayComponents(
+            new TextDisplayBuilder()
+              .setContent(`*Page ${page + 1} of ${changelog.length}*`)
+          );
+
+        const row = new ActionRowBuilder()
+          .addComponents(
+            new ButtonBuilder()
+              .setCustomId(`cl_prev_${page}`)
+              .setLabel("Previous")
+              .setStyle(ButtonStyle.Secondary)
+              .setDisabled(page === 0),
+
+            new ButtonBuilder()
+              .setCustomId(`cl_next_${page}`)
+              .setLabel("Next")
+              .setStyle(ButtonStyle.Secondary)
+              .setDisabled(page === changelog.length - 1),
+
+            new ButtonBuilder()
+              .setCustomId("cl_latest")
+              .setLabel("Latest")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(page === 0)
+          );
+
+        container.addActionRowComponents(row);
+
+        return message.reply({
+          components: [container],
+          flags: MessageFlags.IsComponentsV2
+        });
+      } catch (error) {
+        console.error("Changelog command error:", error);
+        return message.reply("An error occurred loading the changelog.");
+      }
     }
 
-    const page = 0;
-    const entry = changelog[page];
-    
-    if (!entry || typeof entry !== 'object') {
-      return message.reply("Could not load changelog entry.");
-    }
 
-    if (!entry.title || !entry.version || !entry.date || !entry.changes) {
-      return message.reply("Changelog entry is missing required fields.");
-    }
 
-    const container = new ContainerBuilder()
-      .addTextDisplayComponents(
-        new TextDisplayBuilder()
-          .setContent(`## ${entry.title}\n**Version:** \`${entry.version}\`\n**Date:** \`${entry.date}\``)
-      )
-      .addSeparatorComponents(
-        new SeparatorBuilder().setSpacing(SeparatorSpacingSize.Small).setDivider(true)
-      )
-      .addTextDisplayComponents(
-        new TextDisplayBuilder()
-          .setContent(entry.changes.map(c => `• ${c}`).join("\n"))
-      )
-      .addTextDisplayComponents(
-        new TextDisplayBuilder()
-          .setContent(`*Page ${page + 1} of ${changelog.length}*`)
-      );
-
-    const row = new ActionRowBuilder()
-      .addComponents(
-        new ButtonBuilder()
-          .setCustomId(`cl_prev_${page}`)
-          .setLabel("Previous")
-          .setStyle(ButtonStyle.Secondary)
-          .setDisabled(page === 0),
-
-        new ButtonBuilder()
-          .setCustomId(`cl_next_${page}`)
-          .setLabel("Next")
-          .setStyle(ButtonStyle.Secondary)
-          .setDisabled(page === changelog.length - 1),
-
-        new ButtonBuilder()
-          .setCustomId("cl_latest")
-          .setLabel("Latest")
-          .setStyle(ButtonStyle.Primary)
-          .setDisabled(page === 0)
-      );
-
-    container.addActionRowComponents(row);
-
-    return message.reply({
-      components: [container],
-      flags: MessageFlags.IsComponentsV2
-    });
-  } catch (error) {
-    console.error("Changelog command error:", error);
-    return message.reply("An error occurred loading the changelog.");
-  }
-    }
-    
-    
-    
     if (command === "fox") {
       try {
         const res = await fetch("https://randomfox.ca/floof/");
@@ -922,6 +922,166 @@ Thank you for using Ninja V2.`
     }
 
 
+    if (command === "time") {
+      try {
+        const profile = await getUserProfile(message.author.id);
+
+        if (profile && profile.timezone) {
+          // Show their current time
+          try {
+            const now = new Date().toLocaleString("en-US", {
+              timeZone: profile.timezone,
+              dateStyle: "full",
+              timeStyle: "long"
+            });
+
+            const container = new ContainerBuilder()
+              .setDisplay(
+                new TextDisplayBuilder()
+                  .set.title("⏰ Your Time")
+                  .set.description(
+                    `**Timezone:** ${profile.timezone}\n` +
+                    `**Current Time:** ${now}`
+                  )
+              );
+
+            const row = {
+              type: 1,
+              components: [
+                new ButtonBuilder()
+                  .setCustomId("time_change")
+                  .setLabel("Change Timezone")
+                  .setStyle(ButtonStyle.Primary),
+
+                new ButtonBuilder()
+                  .setCustomId("time_unlink")
+                  .setLabel("Remove Timezone")
+                  .setStyle(ButtonStyle.Danger)
+              ]
+            };
+
+            return message.reply({
+              ui: [container],
+              components: [row]
+            });
+          } catch (err) {
+            // Invalid saved timezone, show selector
+          }
+        }
+
+        // Show timezone selector
+        const container = new ContainerBuilder()
+          .setDisplay(
+            new TextDisplayBuilder()
+              .set.title("⏰ Select Your Timezone")
+              .set.description("Choose your timezone from the menu below to save it.")
+          );
+
+        const timezones = [
+          // Americas
+          { label: "🌎 Eastern Time (New York)", value: "America/New_York" },
+          { label: "🌎 Central Time (Chicago)", value: "America/Chicago" },
+          { label: "🌎 Mountain Time (Denver)", value: "America/Denver" },
+          { label: "🌎 Pacific Time (Los Angeles)", value: "America/Los_Angeles" },
+          { label: "🌎 Alaska Time", value: "America/Anchorage" },
+          { label: "🌎 Hawaii Time", value: "Pacific/Honolulu" },
+          { label: "🌎 Toronto", value: "America/Toronto" },
+          { label: "🌎 Mexico City", value: "America/Mexico_City" },
+          { label: "🌎 São Paulo", value: "America/Sao_Paulo" },
+          { label: "🌎 Buenos Aires", value: "America/Argentina/Buenos_Aires" },
+
+          // Europe
+          { label: "🌍 London (GMT)", value: "Europe/London" },
+          { label: "🌍 Paris (CET)", value: "Europe/Paris" },
+          { label: "🌍 Berlin", value: "Europe/Berlin" },
+          { label: "🌍 Rome", value: "Europe/Rome" },
+          { label: "🌍 Madrid", value: "Europe/Madrid" },
+          { label: "🌍 Amsterdam", value: "Europe/Amsterdam" },
+          { label: "🌍 Brussels", value: "Europe/Brussels" },
+          { label: "🌍 Vienna", value: "Europe/Vienna" },
+          { label: "🌍 Warsaw", value: "Europe/Warsaw" },
+          { label: "🌍 Athens", value: "Europe/Athens" },
+          { label: "🌍 Istanbul", value: "Europe/Istanbul" },
+          { label: "🌍 Moscow", value: "Europe/Moscow" },
+
+          // Asia
+          { label: "🌏 Dubai", value: "Asia/Dubai" },
+          { label: "🌏 Mumbai", value: "Asia/Kolkata" },
+          { label: "🌏 Bangkok", value: "Asia/Bangkok" },
+          { label: "🌏 Singapore", value: "Asia/Singapore" },
+          { label: "🌏 Hong Kong", value: "Asia/Hong_Kong" },
+          { label: "🌏 Shanghai", value: "Asia/Shanghai" },
+          { label: "🌏 Tokyo", value: "Asia/Tokyo" },
+          { label: "🌏 Seoul", value: "Asia/Seoul" },
+
+          // Oceania
+          { label: "🌏 Sydney", value: "Australia/Sydney" },
+          { label: "🌏 Melbourne", value: "Australia/Melbourne" },
+          { label: "🌏 Brisbane", value: "Australia/Brisbane" },
+          { label: "🌏 Perth", value: "Australia/Perth" },
+          { label: "🌏 Auckland", value: "Pacific/Auckland" },
+
+          // Africa
+          { label: "🌍 Cairo", value: "Africa/Cairo" },
+          { label: "🌍 Johannesburg", value: "Africa/Johannesburg" },
+          { label: "🌍 Lagos", value: "Africa/Lagos" },
+          { label: "🌍 Nairobi", value: "Africa/Nairobi" }
+        ];
+
+        const selectMenu = new StringSelectMenuBuilder()
+          .setCustomId("time_select")
+          .setPlaceholder("Select your timezone")
+          .addOptions(timezones);
+
+        const row = {
+          type: 1,
+          components: [selectMenu]
+        };
+
+        return message.reply({
+          ui: [container],
+          components: [row]
+        });
+
+      } catch (error) {
+        console.error("Time command error:", error);
+        return message.reply("An error occurred while loading the timezone selector.");
+      }
+    }
+
+
+    if (command === "timeunlink") {
+      try {
+        const profile = await getUserProfile(message.author.id);
+
+        if (!profile || !profile.timezone) {
+          const container = new ContainerBuilder()
+            .setDisplay(
+              new TextDisplayBuilder()
+                .set.title("❌ No Timezone Set")
+                .set.description("You don't have a timezone saved. Use `,time` to set one!")
+            );
+
+          return message.reply({ ui: [container] });
+        }
+
+        profile.timezone = null;
+        await setUserProfile(message.author.id, profile);
+
+        const container = new ContainerBuilder()
+          .setDisplay(
+            new TextDisplayBuilder()
+              .set.title("✅ Timezone Removed")
+              .set.description("Your timezone has been removed successfully.")
+          );
+
+        return message.reply({ ui: [container] });
+
+      } catch (error) {
+        console.error("Timeunlink command error:", error);
+        return message.reply("An error occurred while removing your timezone.");
+      }
+    }
 
     if (command === "luck") {
       const luck = Math.floor(Math.random() * 101); // 0–100%
@@ -1155,9 +1315,9 @@ Thank you for using Ninja V2.`
     }
 
 
-      
 
-    
+
+
 
     if (command === "pokemon") {
       try {
@@ -2462,76 +2622,207 @@ client.on('interactionCreate', async (interaction) => {
       return interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
     }
 
-    // ===== BUTTON INTERACTION HANDLER =====
-// Put this in your interactionCreate event handler
-client.on('interactionCreate', async (interaction) => {
-  if (!interaction.isButton()) return;
+    // ===== CHANGELOG BUTTON HANDLER =====
+    if (interaction.isButton() && interaction.customId.startsWith('cl_')) {
+      if (!changelog || changelog.length === 0) {
+        return interaction.reply({ content: "No changelog entries found!", ephemeral: true });
+      }
 
-  const customId = interaction.customId;
+      let page = 0;
 
-  // Changelog button handlers
-  if (customId.startsWith('cl_')) {
-    if (!changelog || changelog.length === 0) {
-      return interaction.reply({ content: "No changelog entries found!", ephemeral: true });
-    }
+      if (interaction.customId.startsWith('cl_prev_')) {
+        page = parseInt(interaction.customId.split('_')[2]) - 1;
+        page = Math.max(0, page);
+      } else if (interaction.customId.startsWith('cl_next_')) {
+        page = parseInt(interaction.customId.split('_')[2]) + 1;
+        page = Math.min(changelog.length - 1, page);
+      } else if (interaction.customId === 'cl_latest') {
+        page = 0;
+      }
 
-    let page = 0;
+      const entry = changelog[page];
 
-    if (customId.startsWith('cl_prev_')) {
-      page = parseInt(customId.split('_')[2]) - 1;
-      page = Math.max(0, page);
-    } else if (customId.startsWith('cl_next_')) {
-      page = parseInt(customId.split('_')[2]) + 1;
-      page = Math.min(changelog.length - 1, page);
-    } else if (customId === 'cl_latest') {
-      page = 0;
-    }
-
-    const entry = changelog[page];
-
-    const container = new ContainerBuilder()
-      .setDisplay(
-        new TextDisplayBuilder()
-          .set.title(entry.title)
-          .set.description(
+      const container = new ContainerBuilder()
+        .setAccentColor(0x2b2d31)
+        .addTextDisplayComponents(
+          (text) => text.setContent(`**📋 ${entry.title}**`),
+          (text) => text.setContent(
             `**Version:** \`${entry.version}\`\n` +
             `**Date:** \`${entry.date}\`\n\n` +
             entry.changes.map(c => `• ${c}`).join("\n") +
             `\n\n*Page ${page + 1} of ${changelog.length}*`
           )
-      );
+        )
+        .addSeparatorComponents((sep) => sep.setDivider(true))
+        .addActionRowComponents((row) =>
+          row.addComponents(
+            new ButtonBuilder()
+              .setCustomId(`cl_prev_${page}`)
+              .setLabel("Previous")
+              .setStyle(ButtonStyle.Secondary)
+              .setDisabled(page === 0),
+            new ButtonBuilder()
+              .setCustomId(`cl_next_${page}`)
+              .setLabel("Next")
+              .setStyle(ButtonStyle.Secondary)
+              .setDisabled(page === changelog.length - 1),
+            new ButtonBuilder()
+              .setCustomId("cl_latest")
+              .setLabel("Latest")
+              .setStyle(ButtonStyle.Primary)
+              .setDisabled(page === 0)
+          )
+        )
+        .addTextDisplayComponents((text) => text.setContent(`-# ${client.user.username} • Changelog`));
 
-    const row = {
-      type: 1,
-      components: [
-        new ButtonBuilder()
-          .setCustomId(`cl_prev_${page}`)
-          .setLabel("Previous")
-          .setStyle(ButtonStyle.Secondary)
-          .setDisabled(page === 0),
+      return interaction.update({ components: [container], flags: MessageFlags.IsComponentsV2 });
+    }
 
-        new ButtonBuilder()
-          .setCustomId(`cl_next_${page}`)
-          .setLabel("Next")
-          .setStyle(ButtonStyle.Secondary)
-          .setDisabled(page === changelog.length - 1),
+    // ===== TIME SELECT MENU HANDLER =====
+    if (interaction.isStringSelectMenu() && interaction.customId === "time_select") {
+      try {
+        const timezone = interaction.values[0];
 
-        new ButtonBuilder()
-          .setCustomId("cl_latest")
-          .setLabel("Latest")
-          .setStyle(ButtonStyle.Primary)
-          .setDisabled(page === 0)
-      ]
-    };
+        // Save timezone
+        const profile = await getUserProfile(interaction.user.id) || {};
+        profile.timezone = timezone;
+        await setUserProfile(interaction.user.id, profile);
 
-    await interaction.update({
-      components: [row],
-      ui: [container]
-    });
-  }
-}); 
-        
-    
+        // Show confirmation with current time
+        const now = new Date().toLocaleString("en-US", {
+          timeZone: timezone,
+          dateStyle: "full",
+          timeStyle: "long"
+        });
+
+        const container = new ContainerBuilder()
+          .setDisplay(
+            new TextDisplayBuilder()
+              .set.title("✅ Timezone Saved")
+              .set.description(
+                `**Timezone:** ${timezone}\n` +
+                `**Current Time:** ${now}\n\n` +
+                `Use \`,time\` anytime to check your current time!`
+              )
+          );
+
+        await interaction.update({
+          ui: [container],
+          components: []
+        });
+      } catch (error) {
+        console.error("Time select error:", error);
+        await interaction.reply({ content: "An error occurred!", ephemeral: true });
+      }
+    }
+
+    // Handle time change button
+    if (interaction.isButton() && interaction.customId === "time_change") {
+      try {
+        const container = new ContainerBuilder()
+          .setDisplay(
+            new TextDisplayBuilder()
+              .set.title("⏰ Select Your Timezone")
+              .set.description("Choose your timezone from the menu below to update it.")
+          );
+
+        const timezones = [
+          // Americas
+          { label: "🌎 Eastern Time (New York)", value: "America/New_York" },
+          { label: "🌎 Central Time (Chicago)", value: "America/Chicago" },
+          { label: "🌎 Mountain Time (Denver)", value: "America/Denver" },
+          { label: "🌎 Pacific Time (Los Angeles)", value: "America/Los_Angeles" },
+          { label: "🌎 Alaska Time", value: "America/Anchorage" },
+          { label: "🌎 Hawaii Time", value: "Pacific/Honolulu" },
+          { label: "🌎 Toronto", value: "America/Toronto" },
+          { label: "🌎 Mexico City", value: "America/Mexico_City" },
+          { label: "🌎 São Paulo", value: "America/Sao_Paulo" },
+          { label: "🌎 Buenos Aires", value: "America/Argentina/Buenos_Aires" },
+
+          // Europe
+          { label: "🌍 London (GMT)", value: "Europe/London" },
+          { label: "🌍 Paris (CET)", value: "Europe/Paris" },
+          { label: "🌍 Berlin", value: "Europe/Berlin" },
+          { label: "🌍 Rome", value: "Europe/Rome" },
+          { label: "🌍 Madrid", value: "Europe/Madrid" },
+          { label: "🌍 Amsterdam", value: "Europe/Amsterdam" },
+          { label: "🌍 Brussels", value: "Europe/Brussels" },
+          { label: "🌍 Vienna", value: "Europe/Vienna" },
+          { label: "🌍 Warsaw", value: "Europe/Warsaw" },
+          { label: "🌍 Athens", value: "Europe/Athens" },
+          { label: "🌍 Istanbul", value: "Europe/Istanbul" },
+          { label: "🌍 Moscow", value: "Europe/Moscow" },
+
+          // Asia
+          { label: "🌏 Dubai", value: "Asia/Dubai" },
+          { label: "🌏 Mumbai", value: "Asia/Kolkata" },
+          { label: "🌏 Bangkok", value: "Asia/Bangkok" },
+          { label: "🌏 Singapore", value: "Asia/Singapore" },
+          { label: "🌏 Hong Kong", value: "Asia/Hong_Kong" },
+          { label: "🌏 Shanghai", value: "Asia/Shanghai" },
+          { label: "🌏 Tokyo", value: "Asia/Tokyo" },
+          { label: "🌏 Seoul", value: "Asia/Seoul" },
+
+          // Oceania
+          { label: "🌏 Sydney", value: "Australia/Sydney" },
+          { label: "🌏 Melbourne", value: "Australia/Melbourne" },
+          { label: "🌏 Brisbane", value: "Australia/Brisbane" },
+          { label: "🌏 Perth", value: "Australia/Perth" },
+          { label: "🌏 Auckland", value: "Pacific/Auckland" },
+
+          // Africa
+          { label: "🌍 Cairo", value: "Africa/Cairo" },
+          { label: "🌍 Johannesburg", value: "Africa/Johannesburg" },
+          { label: "🌍 Lagos", value: "Africa/Lagos" },
+          { label: "🌍 Nairobi", value: "Africa/Nairobi" }
+        ];
+
+        const selectMenu = new StringSelectMenuBuilder()
+          .setCustomId("time_select")
+          .setPlaceholder("Select your timezone")
+          .addOptions(timezones);
+
+        const row = {
+          type: 1,
+          components: [selectMenu]
+        };
+
+        await interaction.update({
+          ui: [container],
+          components: [row]
+        });
+      } catch (error) {
+        console.error("Time change button error:", error);
+        await interaction.reply({ content: "An error occurred!", ephemeral: true });
+      }
+    }
+
+    // Handle time unlink button
+    if (interaction.customId === "time_unlink") {
+      try {
+        const profile = await getUserProfile(interaction.user.id);
+
+        if (profile) {
+          profile.timezone = null;
+          await setUserProfile(interaction.user.id, profile);
+        }
+
+        const container = new ContainerBuilder()
+          .setDisplay(
+            new TextDisplayBuilder()
+              .set.title("✅ Timezone Removed")
+              .set.description("Your timezone has been removed successfully.")
+          );
+
+        await interaction.update({
+          ui: [container],
+          components: []
+        });
+      } catch (error) {
+        console.error("Time unlink button error:", error);
+        await interaction.reply({ content: "An error occurred!", ephemeral: true });
+      }
+    }
     // ============================================================
     // LEADERBOARD BUTTONS (AFK + MSG)
     // ============================================================
@@ -2617,6 +2908,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
