@@ -36,16 +36,18 @@ let lastRestartChannel = null;
 
 const changelog = [
   {
+    title: "Timzones Update",
+    version: "1.0.2",
+    date: "2026-01-07",
+    changes: ["Added 25+ timezones", "Added ,settz command ", "added a ,time command","Added a ,tzunlink command"],
+  },
+  {
     title: "Initial Release",
-    version: "1.0.0",
-    date: "2026-01-01",
+    version: "1.0.1",
+    date: "2026-01-05",
     changes: ["Fixed afk storage","Added a ,changelog command"],
   },
   {
-    title: "Bug Fixes",
-    version: "1.0.1",
-    date: "2026-01-03",
-    changes: ["Added 25+ timezones", "Added ,settz command ", "added a ,time command","Added a ,tzunlink command"],
   },
   ];
     
@@ -2935,6 +2937,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
