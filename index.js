@@ -893,34 +893,7 @@ Thank you for using Ninja V2.`
     }
 
 
-
-
-    if (command === "servericon") {
-      if (!message.guild) return;
-
-      const icon = message.guild.iconURL({ size: 4096 });
-
-      const gallery = new MediaGalleryBuilder();
-      if (icon) {
-        gallery.addItems(
-          new MediaGalleryItemBuilder().setURL(icon)
-        );
-      }
-
-      const container = new ContainerBuilder()
-        .setAccentColor(0x2b2d31)
-        .addTextDisplayComponents(
-          (text) => text.setContent("## 📷 Server Icon")
-        )
-        .addMediaGalleryComponents(gallery);
-
-      return message.reply({
-        components: [container],
-        flags: MessageFlags.IsComponentsV2,
-        allowedMentions: { repliedUser: false }
-      });
-    }
-// ===== TIME COMMAND (FIXED WITH 25 TIMEZONES MAX) =====
+// ===== TIME COMMAND (WITH DROPDOWN INSIDE CONTAINER) =====
 if (command === "time") {
   try {
     const profile = await getUserProfile(message.author.id);
@@ -966,12 +939,6 @@ if (command === "time") {
     }
     
     // Show timezone selector
-    const container = new ContainerBuilder()
-      .addTextDisplayComponents(
-        (text) => text.setContent("⏰ **Select Your Timezone**"),
-        (text) => text.setContent("Choose your timezone from the menu below to save it.")
-      );
-    
     const timezones = [
       // Americas
       { label: "🌎 Eastern Time (New York)", value: "America/New_York" },
@@ -1009,18 +976,22 @@ if (command === "time") {
       { label: "🌍 Lagos", value: "Africa/Lagos" }
     ];
     
-    const selectMenu = new StringSelectMenuBuilder()
-      .setCustomId("time_select")
-      .setPlaceholder("Select your timezone")
-      .addOptions(timezones);
-    
-    const row = {
-      type: 1,
-      components: [selectMenu]
-    };
+    const container = new ContainerBuilder()
+      .addTextDisplayComponents(
+        (text) => text.setContent("⏰ **Select Your Timezone**"),
+        (text) => text.setContent("Choose your timezone from the menu below to save it.")
+      )
+      .addActionRowComponents((row) =>
+        row.addComponents(
+          new StringSelectMenuBuilder()
+            .setCustomId("time_select")
+            .setPlaceholder("Select your timezone")
+            .addOptions(timezones)
+        )
+      );
     
     return message.reply({
-      components: [container, row],
+      components: [container],
       flags: MessageFlags.IsComponentsV2
     });
     
@@ -1066,8 +1037,38 @@ if (command === "timeunlink") {
     console.error("Timeunlink command error:", error);
     return message.reply("An error occurred while removing your timezone.");
   }
-       }
+            }
 
+    if (command === "servericon") {
+      if (!message.guild) return;
+
+      const icon = message.guild.iconURL({ size: 4096 });
+
+      const gallery = new MediaGalleryBuilder();
+      if (icon) {
+        gallery.addItems(
+          new MediaGalleryItemBuilder().setURL(icon)
+        );
+      }
+
+      const container = new ContainerBuilder()
+        .setAccentColor(0x2b2d31)
+        .addTextDisplayComponents(
+          (text) => text.setContent("## 📷 Server Icon")
+        )
+        .addMediaGalleryComponents(gallery);
+
+      return message.reply({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        allowedMentions: { repliedUser: false }
+      });
+    }
+
+
+
+
+    
     if (command === "memberdm") {
       const senderId = message.author.id;
       const now = Date.now();
@@ -2553,7 +2554,9 @@ Thank you for using Ninja V2.`
   }
 });
 
-                client.on('interactionCreate', async (interaction) => {
+                
+        // ===== COMPLETE INTERACTION HANDLER =====
+client.on('interactionCreate', async (interaction) => {
   try {
     
     // Handle select menus
@@ -2574,19 +2577,18 @@ Thank you for using Ninja V2.`
         });
         
         const container = new ContainerBuilder()
-          .setDisplay(
-            new TextDisplayBuilder()
-              .setTitle("✅ Timezone Saved")
-              .setDescription(
-                `**Timezone:** ${timezone}\n` +
-                `**Current Time:** ${now}\n\n` +
-                `Use \`,time\` anytime to check your current time!`
-              )
+          .addTextDisplayComponents(
+            (text) => text.setContent("✅ **Timezone Saved**"),
+            (text) => text.setContent(
+              `**Timezone:** ${timezone}\n` +
+              `**Current Time:** ${now}\n\n` +
+              `Use \`,time\` anytime to check your current time!`
+            )
           );
         
         return interaction.update({
-          ui: [container],
-          components: []
+          components: [container],
+          flags: MessageFlags.IsComponentsV2
         });
       }
     }
@@ -2620,80 +2622,58 @@ Thank you for using Ninja V2.`
         }
 
         const container = new ContainerBuilder()
-          .setDisplay(
-            new TextDisplayBuilder()
-              .setTitle(entry.title)
-              .setDescription(
-                `**Version:** \`${entry.version}\`\n` +
-                `**Date:** \`${entry.date}\`\n\n` +
-                entry.changes.map(c => `• ${c}`).join("\n") +
-                `\n\n*Page ${page + 1} of ${changelog.length}*`
-              )
+          .addTextDisplayComponents(
+            (text) => text.setContent(`**${entry.title}**`),
+            (text) => text.setContent(
+              `**Version:** \`${entry.version}\`\n` +
+              `**Date:** \`${entry.date}\`\n\n` +
+              entry.changes.map(c => `• ${c}`).join("\n") +
+              `\n\n*Page ${page + 1} of ${changelog.length}*`
+            )
+          )
+          .addActionRowComponents((row) =>
+            row.addComponents(
+              new ButtonBuilder()
+                .setCustomId(`cl_prev_${page}`)
+                .setLabel("Previous")
+                .setStyle(ButtonStyle.Secondary)
+                .setDisabled(page === 0),
+              new ButtonBuilder()
+                .setCustomId(`cl_next_${page}`)
+                .setLabel("Next")
+                .setStyle(ButtonStyle.Secondary)
+                .setDisabled(page === changelog.length - 1),
+              new ButtonBuilder()
+                .setCustomId("cl_latest")
+                .setLabel("Latest")
+                .setStyle(ButtonStyle.Primary)
+                .setDisabled(page === 0)
+            )
           );
 
-        const row = {
-          type: 1,
-          components: [
-            new ButtonBuilder()
-              .setCustomId(`cl_prev_${page}`)
-              .setLabel("Previous")
-              .setStyle(ButtonStyle.Secondary)
-              .setDisabled(page === 0),
-
-            new ButtonBuilder()
-              .setCustomId(`cl_next_${page}`)
-              .setLabel("Next")
-              .setStyle(ButtonStyle.Secondary)
-              .setDisabled(page === changelog.length - 1),
-
-            new ButtonBuilder()
-              .setCustomId("cl_latest")
-              .setLabel("Latest")
-              .setStyle(ButtonStyle.Primary)
-              .setDisabled(page === 0)
-          ]
-        };
-
         return interaction.update({
-          components: [row],
-          ui: [container]
+          components: [container],
+          flags: MessageFlags.IsComponentsV2
         });
       }
       
       // Time change button
       if (customId === "time_change") {
-        const container = new ContainerBuilder()
-          .setDisplay(
-            new TextDisplayBuilder()
-              .setTitle("⏰ Select Your Timezone")
-              .setDescription("Choose your timezone from the menu below to update it.")
-          );
-        
         const timezones = [
           // Americas
           { label: "🌎 Eastern Time (New York)", value: "America/New_York" },
           { label: "🌎 Central Time (Chicago)", value: "America/Chicago" },
           { label: "🌎 Mountain Time (Denver)", value: "America/Denver" },
           { label: "🌎 Pacific Time (Los Angeles)", value: "America/Los_Angeles" },
-          { label: "🌎 Alaska Time", value: "America/Anchorage" },
-          { label: "🌎 Hawaii Time", value: "Pacific/Honolulu" },
           { label: "🌎 Toronto", value: "America/Toronto" },
           { label: "🌎 Mexico City", value: "America/Mexico_City" },
           { label: "🌎 São Paulo", value: "America/Sao_Paulo" },
-          { label: "🌎 Buenos Aires", value: "America/Argentina/Buenos_Aires" },
           
           // Europe
           { label: "🌍 London (GMT)", value: "Europe/London" },
           { label: "🌍 Paris (CET)", value: "Europe/Paris" },
           { label: "🌍 Berlin", value: "Europe/Berlin" },
-          { label: "🌍 Rome", value: "Europe/Rome" },
-          { label: "🌍 Madrid", value: "Europe/Madrid" },
           { label: "🌍 Amsterdam", value: "Europe/Amsterdam" },
-          { label: "🌍 Brussels", value: "Europe/Brussels" },
-          { label: "🌍 Vienna", value: "Europe/Vienna" },
-          { label: "🌍 Warsaw", value: "Europe/Warsaw" },
-          { label: "🌍 Athens", value: "Europe/Athens" },
-          { label: "🌍 Istanbul", value: "Europe/Istanbul" },
           { label: "🌍 Moscow", value: "Europe/Moscow" },
           
           // Asia
@@ -2702,37 +2682,37 @@ Thank you for using Ninja V2.`
           { label: "🌏 Bangkok", value: "Asia/Bangkok" },
           { label: "🌏 Singapore", value: "Asia/Singapore" },
           { label: "🌏 Hong Kong", value: "Asia/Hong_Kong" },
-          { label: "🌏 Shanghai", value: "Asia/Shanghai" },
           { label: "🌏 Tokyo", value: "Asia/Tokyo" },
           { label: "🌏 Seoul", value: "Asia/Seoul" },
           
           // Oceania
           { label: "🌏 Sydney", value: "Australia/Sydney" },
           { label: "🌏 Melbourne", value: "Australia/Melbourne" },
-          { label: "🌏 Brisbane", value: "Australia/Brisbane" },
-          { label: "🌏 Perth", value: "Australia/Perth" },
           { label: "🌏 Auckland", value: "Pacific/Auckland" },
           
           // Africa
           { label: "🌍 Cairo", value: "Africa/Cairo" },
           { label: "🌍 Johannesburg", value: "Africa/Johannesburg" },
-          { label: "🌍 Lagos", value: "Africa/Lagos" },
-          { label: "🌍 Nairobi", value: "Africa/Nairobi" }
+          { label: "🌍 Lagos", value: "Africa/Lagos" }
         ];
         
-        const selectMenu = new StringSelectMenuBuilder()
-          .setCustomId("time_select")
-          .setPlaceholder("Select your timezone")
-          .addOptions(timezones);
-        
-        const row = {
-          type: 1,
-          components: [selectMenu]
-        };
+        const container = new ContainerBuilder()
+          .addTextDisplayComponents(
+            (text) => text.setContent("⏰ **Select Your Timezone**"),
+            (text) => text.setContent("Choose your timezone from the menu below to update it.")
+          )
+          .addActionRowComponents((row) =>
+            row.addComponents(
+              new StringSelectMenuBuilder()
+                .setCustomId("time_select")
+                .setPlaceholder("Select your timezone")
+                .addOptions(timezones)
+            )
+          );
         
         return interaction.update({
-          ui: [container],
-          components: [row]
+          components: [container],
+          flags: MessageFlags.IsComponentsV2
         });
       }
       
@@ -2746,15 +2726,14 @@ Thank you for using Ninja V2.`
         }
         
         const container = new ContainerBuilder()
-          .setDisplay(
-            new TextDisplayBuilder()
-              .setTitle("✅ Timezone Removed")
-              .setDescription("Your timezone has been removed successfully.")
+          .addTextDisplayComponents(
+            (text) => text.setContent("✅ **Timezone Removed**"),
+            (text) => text.setContent("Your timezone has been removed successfully.")
           );
         
         return interaction.update({
-          ui: [container],
-          components: []
+          components: [container],
+          flags: MessageFlags.IsComponentsV2
         });
       }
       
@@ -2803,7 +2782,6 @@ Thank you for using Ninja V2.`
           if (isMsg) return `**${rank}.** <@${oduserId}> — **${value} messages**`;
         });
 
-        const botName = client.user.username;
         const container = new ContainerBuilder()
           .setAccentColor(0x2b2d31)
           .addTextDisplayComponents(
@@ -2832,11 +2810,23 @@ Thank you for using Ninja V2.`
     
   } catch (err) {
     console.error('Interaction failed:', err);
+    console.error('Stack trace:', err.stack);
+    // Try to respond if we haven't already
+    try {
+      if (interaction.replied || interaction.deferred) {
+        await interaction.followUp({ content: 'An error occurred!', ephemeral: true });
+      } else {
+        await interaction.reply({ content: 'An error occurred!', ephemeral: true });
+      }
+    } catch (e) {
+      // Ignore if we can't send error message
+    }
   }
 });
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
