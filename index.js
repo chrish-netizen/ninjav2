@@ -47,8 +47,6 @@ const changelog = [
     date: "2026-01-05",
     changes: ["Fixed afk storage","Added a ,changelog command"],
   },
-  {
-  },
   ];
     
     
@@ -2937,6 +2935,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
