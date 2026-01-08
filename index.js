@@ -1106,7 +1106,112 @@ if (command === "timeunlink") {
       });
     }
 
-
+// ===== SETTZ COMMAND =====
+if (command === "settz") {
+  try {
+    const timezone = args.join(" ");
+    
+    if (!timezone) {
+      return message.reply("Usage: `,settz <timezone>`\nExample: `,settz Asia/Manila`\n\nOr use `,time` to select from a list.");
+    }
+    
+    // Try to validate the timezone
+    try {
+      new Date().toLocaleString("en-US", { timeZone: timezone });
+      
+      // Valid timezone, save it
+      const profile = await getUserProfile(message.author.id) || {};
+      profile.timezone = timezone;
+      await setUserProfile(message.author.id, profile);
+      
+      const now = new Date().toLocaleString("en-US", { 
+        timeZone: timezone,
+        dateStyle: "full",
+        timeStyle: "long"
+      });
+      
+      const container = new ContainerBuilder()
+        .addTextDisplayComponents(
+          (text) => text.setContent("**✅ Timezone Saved**"),
+          (text) => text.setContent(
+            `**Timezone:** ${timezone}\n` +
+            `**Current Time:** ${now}\n\n` +
+            `Use \`,time\` to view your time anytime!`
+          )
+        );
+      
+      return message.reply({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        allowedMentions: { repliedUser: false }
+      });
+      
+    } catch (err) {
+      // Invalid timezone, show selector (same as ,time command)
+      const timezones = [
+        // Americas
+        { label: "🇺🇸 New York (EST)", value: "America/New_York" },
+        { label: "🇺🇸 Los Angeles (PST)", value: "America/Los_Angeles" },
+        { label: "🇨🇦 Toronto", value: "America/Toronto" },
+        { label: "🇲🇽 Mexico City", value: "America/Mexico_City" },
+        { label: "🇧🇷 São Paulo", value: "America/Sao_Paulo" },
+        { label: "🇦🇷 Buenos Aires", value: "America/Argentina/Buenos_Aires" },
+        
+        // Europe
+        { label: "🇬🇧 London", value: "Europe/London" },
+        { label: "🇫🇷 Paris", value: "Europe/Paris" },
+        { label: "🇩🇪 Berlin", value: "Europe/Berlin" },
+        { label: "🇪🇸 Madrid", value: "Europe/Madrid" },
+        { label: "🇮🇹 Rome", value: "Europe/Rome" },
+        { label: "🇳🇱 Amsterdam", value: "Europe/Amsterdam" },
+        { label: "🇷🇺 Moscow", value: "Europe/Moscow" },
+        { label: "🇬🇷 Athens", value: "Europe/Athens" },
+        
+        // Asia
+        { label: "🇦🇪 Dubai", value: "Asia/Dubai" },
+        { label: "🇮🇳 Mumbai", value: "Asia/Kolkata" },
+        { label: "🇹🇭 Bangkok", value: "Asia/Bangkok" },
+        { label: "🇸🇬 Singapore", value: "Asia/Singapore" },
+        { label: "🇵🇭 Manila", value: "Asia/Manila" },
+        { label: "🇯🇵 Tokyo", value: "Asia/Tokyo" },
+        { label: "🇰🇷 Seoul", value: "Asia/Seoul" },
+        
+        // Oceania & Africa
+        { label: "🇦🇺 Sydney", value: "Australia/Sydney" },
+        { label: "🇳🇿 Auckland", value: "Pacific/Auckland" },
+        { label: "🇿🇦 Johannesburg", value: "Africa/Johannesburg" },
+        { label: "🇪🇬 Cairo", value: "Africa/Cairo" }
+      ];
+      
+      const container = new ContainerBuilder()
+        .addTextDisplayComponents(
+          (text) => text.setContent("**❌ Invalid Timezone**"),
+          (text) => text.setContent(
+            `**${timezone}** is not a valid timezone.\n\n` +
+            `Select from the list below, or see the full list at:\nhttps://en.wikipedia.org/wiki/List_of_tz_database_time_zones`
+          )
+        )
+        .addActionRowComponents((row) =>
+          row.addComponents(
+            new StringSelectMenuBuilder()
+              .setCustomId("time_select")
+              .setPlaceholder("Select your timezone")
+              .addOptions(timezones)
+          )
+        );
+      
+      return message.reply({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        allowedMentions: { repliedUser: false }
+      });
+    }
+    
+  } catch (error) {
+    console.error("Settz command error:", error);
+    return message.reply("An error occurred while setting your timezone.");
+  }
+}
 
 
     
@@ -2897,6 +3002,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
