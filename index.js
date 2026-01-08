@@ -946,33 +946,32 @@ if (command === "time") {
         });
         
         const container = new ContainerBuilder()
-          .setDisplay(
-            new TextDisplayBuilder()
-              .set.title("⏰ Your Time")
-              .set.description(
-                `**Timezone:** ${profile.timezone}\n` +
-                `**Current Time:** ${now}`
-              )
+          .addTextDisplayComponents(
+            (text) => text.setContent("**⏰ Your Time**"),
+            (text) => text.setContent(
+              `**Timezone:** ${profile.timezone}\n` +
+              `**Current Time:** ${now}`
+            )
           );
         
-        const row = {
-          type: 1,
-          components: [
+        const row = new ActionRowBuilder()
+          .addComponents(
             new ButtonBuilder()
               .setCustomId("time_change")
               .setLabel("Change Timezone")
               .setStyle(ButtonStyle.Primary),
-            
             new ButtonBuilder()
               .setCustomId("time_unlink")
               .setLabel("Remove Timezone")
               .setStyle(ButtonStyle.Danger)
-          ]
-        };
-        
+          );
+
+        container.addActionRowComponents(row);
+
         return message.reply({
-          ui: [container],
-          components: [row]
+          components: [container],
+          flags: MessageFlags.IsComponentsV2,
+          allowedMentions: { repliedUser: false }
         });
       } catch (err) {
         // Invalid saved timezone, show selector
@@ -981,10 +980,9 @@ if (command === "time") {
     
     // Show timezone selector
     const container = new ContainerBuilder()
-      .setDisplay(
-        new TextDisplayBuilder()
-          .set.title("⏰ Select Your Timezone")
-          .set.description("Choose your timezone from the menu below to save it.")
+      .addTextDisplayComponents(
+        (text) => text.setContent("**⏰ Select Your Timezone**"),
+        (text) => text.setContent("Choose your timezone from the menu below to save it.")
       );
     
     const timezones = [
@@ -1043,14 +1041,14 @@ if (command === "time") {
       .setPlaceholder("Select your timezone")
       .addOptions(timezones);
     
-    const row = {
-      type: 1,
-      components: [selectMenu]
-    };
-    
+    const row = new ActionRowBuilder().addComponents(selectMenu);
+
+    container.addActionRowComponents(row);
+
     return message.reply({
-      ui: [container],
-      components: [row]
+      components: [container],
+      flags: MessageFlags.IsComponentsV2,
+      allowedMentions: { repliedUser: false }
     });
     
   } catch (error) {
@@ -1066,26 +1064,32 @@ if (command === "timeunlink") {
     
     if (!profile || !profile.timezone) {
       const container = new ContainerBuilder()
-        .setDisplay(
-          new TextDisplayBuilder()
-            .set.title("❌ No Timezone Set")
-            .set.description("You don't have a timezone saved. Use `,time` to set one!")
+        .addTextDisplayComponents(
+          (text) => text.setContent("**❌ No Timezone Set**"),
+          (text) => text.setContent("You don't have a timezone saved. Use `,time` to set one!")
         );
       
-      return message.reply({ ui: [container] });
+      return message.reply({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        allowedMentions: { repliedUser: false }
+      });
     }
     
     profile.timezone = null;
     await setUserProfile(message.author.id, profile);
     
     const container = new ContainerBuilder()
-      .setDisplay(
-        new TextDisplayBuilder()
-          .set.title("✅ Timezone Removed")
-          .set.description("Your timezone has been removed successfully.")
+      .addTextDisplayComponents(
+        (text) => text.setContent("**✅ Timezone Removed**"),
+        (text) => text.setContent("Your timezone has been removed successfully.")
       );
     
-    return message.reply({ ui: [container] });
+    return message.reply({
+      components: [container],
+      flags: MessageFlags.IsComponentsV2,
+      allowedMentions: { repliedUser: false }
+    });
     
   } catch (error) {
     console.error("Timeunlink command error:", error);
