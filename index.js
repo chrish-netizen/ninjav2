@@ -39,7 +39,7 @@ const changelog = [
     title: "Bug Fixes",
     version: "1.0.3",
     date: "2026-01-09",
-    changes: ["Fixed ,time" "Fixed all storage"],
+    changes: ["Fixed ,time","Fixed all storage"],
     },
 {
 title: "Timzones Update",
@@ -3030,6 +3030,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
