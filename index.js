@@ -33,9 +33,14 @@ import {
 import fetch from 'node-fetch';
 let lastRestartChannel = null;
 
+const = timezones ];
 
-const changelog = [
-  {
+
+title: "test"
+
+},
+{
+  
     title: "Timzones Update",
     version: "1.0.2",
     date: "2026-01-07",
@@ -932,8 +937,53 @@ Thank you for using Ninja V2.`
     }
 
 
+
 if (command === "time") {
   try {
+    const targetUser = message.mentions.users.first();
+    
+    // If user mentioned someone
+    if (targetUser) {
+      const profile = await getUserProfile(targetUser.id);
+      
+      if (!profile || !profile.timezone) {
+        const container = new ContainerBuilder()
+          .addTextDisplayComponents(
+            (text) => text.setContent("**❌ No Timezone Set**"),
+            (text) => text.setContent(`${targetUser.username} hasn't set their timezone yet.`)
+          );
+        
+        return message.reply({
+          components: [container],
+          flags: MessageFlags.IsComponentsV2,
+          allowedMentions: { repliedUser: false }
+        });
+      }
+      
+      // Show their time
+      const now = new Date().toLocaleString("en-US", { 
+        timeZone: profile.timezone,
+        dateStyle: "full",
+        timeStyle: "long"
+      });
+      
+      const container = new ContainerBuilder()
+        .addTextDisplayComponents(
+          (text) => text.setContent(`**⏰ ${targetUser.username}'s Time**`),
+          (text) => text.setContent(
+            `**Timezone:** ${profile.timezone}\n` +
+            `**Current Time:** ${now}`
+          )
+        );
+      
+      return message.reply({
+        components: [container],
+        flags: MessageFlags.IsComponentsV2,
+        allowedMentions: { repliedUser: false }
+      });
+    }
+    
+    // No mention - show own time or selector
     const profile = await getUserProfile(message.author.id);
     
     if (profile && profile.timezone) {
@@ -952,22 +1002,21 @@ if (command === "time") {
               `**Timezone:** ${profile.timezone}\n` +
               `**Current Time:** ${now}`
             )
+          )
+          .addActionRowComponents((row) =>
+            row.addComponents(
+              new ButtonBuilder()
+                .setCustomId("time_change")
+                .setLabel("Change Timezone")
+                .setStyle(ButtonStyle.Primary),
+              
+              new ButtonBuilder()
+                .setCustomId("time_unlink")
+                .setLabel("Remove Timezone")
+                .setStyle(ButtonStyle.Danger)
+            )
           );
         
-        const row = new ActionRowBuilder()
-          .addComponents(
-            new ButtonBuilder()
-              .setCustomId("time_change")
-              .setLabel("Change Timezone")
-              .setStyle(ButtonStyle.Primary),
-            new ButtonBuilder()
-              .setCustomId("time_unlink")
-              .setLabel("Remove Timezone")
-              .setStyle(ButtonStyle.Danger)
-          );
-
-        container.addActionRowComponents(row);
-
         return message.reply({
           components: [container],
           flags: MessageFlags.IsComponentsV2,
@@ -979,56 +1028,55 @@ if (command === "time") {
     }
     
     // Show timezone selector
+    const timezones = [
+      // Americas
+      { label: "🇺🇸 New York (EST)", value: "America/New_York" },
+      { label: "🇺🇸 Los Angeles (PST)", value: "America/Los_Angeles" },
+      { label: "🇨🇦 Toronto", value: "America/Toronto" },
+      { label: "🇲🇽 Mexico City", value: "America/Mexico_City" },
+      { label: "🇧🇷 São Paulo", value: "America/Sao_Paulo" },
+      { label: "🇦🇷 Buenos Aires", value: "America/Argentina/Buenos_Aires" },
+      
+      // Europe
+      { label: "🇬🇧 London", value: "Europe/London" },
+      { label: "🇫🇷 Paris", value: "Europe/Paris" },
+      { label: "🇩🇪 Berlin", value: "Europe/Berlin" },
+      { label: "🇪🇸 Madrid", value: "Europe/Madrid" },
+      { label: "🇮🇹 Rome", value: "Europe/Rome" },
+      { label: "🇳🇱 Amsterdam", value: "Europe/Amsterdam" },
+      { label: "🇷🇺 Moscow", value: "Europe/Moscow" },
+      { label: "🇬🇷 Athens", value: "Europe/Athens" },
+      
+      // Asia
+      { label: "🇦🇪 Dubai", value: "Asia/Dubai" },
+      { label: "🇮🇳 Mumbai", value: "Asia/Kolkata" },
+      { label: "🇹🇭 Bangkok", value: "Asia/Bangkok" },
+      { label: "🇸🇬 Singapore", value: "Asia/Singapore" },
+      { label: "🇵🇭 Manila", value: "Asia/Manila" },
+      { label: "🇯🇵 Tokyo", value: "Asia/Tokyo" },
+      { label: "🇰🇷 Seoul", value: "Asia/Seoul" },
+      
+      // Oceania & Africa
+      { label: "🇦🇺 Sydney", value: "Australia/Sydney" },
+      { label: "🇳🇿 Auckland", value: "Pacific/Auckland" },
+      { label: "🇿🇦 Johannesburg", value: "Africa/Johannesburg" },
+      { label: "🇪🇬 Cairo", value: "Africa/Cairo" }
+    ];
+    
     const container = new ContainerBuilder()
       .addTextDisplayComponents(
         (text) => text.setContent("**⏰ Select Your Timezone**"),
-        (text) => text.setContent("Choose your timezone from the menu below to save it.")
+        (text) => text.setContent("Choose your timezone from the menu below, or use `,settz <timezone>` for others.")
+      )
+      .addActionRowComponents((row) =>
+        row.addComponents(
+          new StringSelectMenuBuilder()
+            .setCustomId("time_select")
+            .setPlaceholder("Select your timezone")
+            .addOptions(timezones)
+        )
       );
     
-    const timezones = [
-  // Americas
-  { label: "🇺🇸 New York (EST)", value: "America/New_York" },
-  { label: "🇺🇸 Los Angeles (PST)", value: "America/Los_Angeles" },
-  { label: "🇨🇦 Toronto", value: "America/Toronto" },
-  { label: "🇲🇽 Mexico City", value: "America/Mexico_City" },
-  { label: "🇧🇷 São Paulo", value: "America/Sao_Paulo" },
-  { label: "🇦🇷 Buenos Aires", value: "America/Argentina/Buenos_Aires" },
-  
-  // Europe
-  { label: "🇬🇧 London", value: "Europe/London" },
-  { label: "🇫🇷 Paris", value: "Europe/Paris" },
-  { label: "🇩🇪 Berlin", value: "Europe/Berlin" },
-  { label: "🇪🇸 Madrid", value: "Europe/Madrid" },
-  { label: "🇮🇹 Rome", value: "Europe/Rome" },
-  { label: "🇳🇱 Amsterdam", value: "Europe/Amsterdam" },
-  { label: "🇷🇺 Moscow", value: "Europe/Moscow" },
-  { label: "🇬🇷 Athens", value: "Europe/Athens" },
-  
-  // Asia
-  { label: "🇦🇪 Dubai", value: "Asia/Dubai" },
-  { label: "🇮🇳 Mumbai", value: "Asia/Kolkata" },
-  { label: "🇹🇭 Bangkok", value: "Asia/Bangkok" },
-  { label: "🇸🇬 Singapore", value: "Asia/Singapore" },
-  { label: "🇵🇭 Manila", value: "Asia/Manila" },
-  { label: "🇯🇵 Tokyo", value: "Asia/Tokyo" },
-  { label: "🇰🇷 Seoul", value: "Asia/Seoul" },
-  
-  // Oceania & Africa
-  { label: "🇦🇺 Sydney", value: "Australia/Sydney" },
-  { label: "🇳🇿 Auckland", value: "Pacific/Auckland" },
-  { label: "🇿🇦 Johannesburg", value: "Africa/Johannesburg" },
-  { label: "🇪🇬 Cairo", value: "Africa/Cairo" }
-];
-    
-    const selectMenu = new StringSelectMenuBuilder()
-      .setCustomId("time_select")
-      .setPlaceholder("Select your timezone")
-      .addOptions(timezones);
-    
-    const row = new ActionRowBuilder().addComponents(selectMenu);
-
-    container.addActionRowComponents(row);
-
     return message.reply({
       components: [container],
       flags: MessageFlags.IsComponentsV2,
@@ -1040,6 +1088,7 @@ if (command === "time") {
     return message.reply("An error occurred while loading the timezone selector.");
   }
 }
+
 
 
 if (command === "timeunlink") {
@@ -3002,6 +3051,7 @@ client.on('interactionCreate', async (interaction) => {
 // ===================== LOGIN ===================== //
 
 client.login(TOKEN);
+
 
 
 
