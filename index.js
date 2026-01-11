@@ -35,8 +35,14 @@ import {
 // Import command handlers
 import { handleUtilityCommands } from './commands/utility.js';
 import { handleFunCommands } from './commands/fun.js';
+import { handleAnimalCommands } from './commands/animals.js';
+import { handleModerationCommands } from './commands/moderation.js';
 import { handleAfkCommands } from './commands/afk.js';
+import { handleLeaderboardCommands } from './commands/leaderboard.js';
 import { handleOwnerCommands } from './commands/owner.js';
+import { handleHelpCommand } from './commands/help.js';
+import { handleTimeCommands } from './commands/time.js';
+import { handleChangelogCommand } from './commands/changelog.js';
 
 // Import event handlers
 import { handleAfkSystem } from './events/afk.js';
@@ -116,30 +122,7 @@ export const state = {
 };
 
 let currentMood = 'Neutral';
-const roasts = [
-  "You're not stupid — you just have bad luck thinking.",
-  "If common sense was a currency, you'd be in debt.",
-  "You're like a cloud. Once you disappear, it's a beautiful day.",
-  "You have the confidence of someone who shouldn't.",
-  "You're proof that evolution can go in reverse.",
-  "I'd agree with you, but then we'd both be wrong.",
-  "You're not useless. You could serve as a bad example.",
-  "Your brain has left the chat.",
-  "You have the energy of a Windows XP error message.",
-  "You're like a software update — nobody asked for you and you take too long."
-];
-const lores = [
-  "was forged in the depths of a forgotten group chat, born from pure chaos and questionable decisions.",
-  "once challenged a Discord mod to a duel and won using only reaction emojis.",
-  "is rumored to be the final boss of every dead server.",
-  "escaped from a parallel universe where everyone speaks in slash commands.",
-  "was banned from 17 servers for excessive rizz deployment.",
-  "once tried to fix a bot and accidentally created sentient code.",
-  "is powered entirely by caffeine, spite, and unstable WiFi.",
-  "was discovered wandering the digital void, mumbling about API limits.",
-  "is the chosen one destined to defeat the lag monster.",
-  "once attempted to roast someone and accidentally summoned a demon."
-];
+
 
 /* ===================== CONNECT TO MONGODB ===================== */
 
@@ -183,7 +166,7 @@ function detectIntent(text) {
 
 function systemPrompt(profile, intent, summary) {
   return `
-You are "Seylun's ninja", chatting in a Discord server.
+You are "Lucarios", chatting in a Discord server.
 
 Personality:
 - upbeat, happy, willing to chat funny.
@@ -392,10 +375,14 @@ client.on('messageCreate', async (message) => {
     // Route to command handlers
     if (await handleUtilityCommands(ctx)) return;
     if (await handleFunCommands(ctx)) return;
+    if (await handleAnimalCommands(ctx)) return;
     if (await handleModerationCommands(ctx)) return;
     if (await handleAfkCommands(ctx)) return;
     if (await handleLeaderboardCommands(ctx)) return;
     if (await handleOwnerCommands(ctx)) return;
+    if (await handleHelpCommand(ctx)) return;
+    if (await handleTimeCommands(ctx)) return;
+    if (await handleChangelogCommand(ctx)) return;
 
     // If no handler caught it, command doesn't exist (optional: add unknown command message)
 
