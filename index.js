@@ -49,26 +49,7 @@ import { handleInteractions } from './events/interactions.js';
 
 let lastRestartChannel = null;
 
-const changelog = [
-  {
-    title: "Bug Fixes",
-    version: "1.0.3",
-    date: "2026-01-09",
-    changes: ["Fixed ,time","Fixed all storage"],
-  },
-  {
-    title: "Timzones Update",
-    version: "1.0.2",
-    date: "2026-01-07",
-    changes: ["Added 25+ timezones", "Added ,settz command ", "added a ,time command","Added a ,tzunlink command"],
-  },
-  {
-    title: "Initial Release",
-    version: "1.0.1",
-    date: "2026-01-05",
-    changes: ["Fixed afk storage","Added a ,changelog command"],
-  },
-];
+
 
 /* ===================== CONFIG ===================== */
 
@@ -422,4 +403,5 @@ process.on('uncaughtException', (err) => {
 /* ===================== LOGIN ===================== */
 
 client.login(TOKEN);
+
 
